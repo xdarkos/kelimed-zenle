@@ -71,6 +71,69 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* Mode seçim butonları */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .mode-selector {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        .mode-btn {
+            padding: 25px 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 3px solid transparent;
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mode-btn:active {
+            transform: translateY(-2px);
+        }
+        
+        .mode-btn.active {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #ffefef 0%, #e9ecef 100%);
+        }
+        
+        .mode-btn i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #ff6b6b;
+        }
+        
+        .mode-btn h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .mode-btn p {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+        
         /* Phase 1: Kelime Girişi */
         #phase1 textarea {
             width: 100%;
@@ -213,6 +276,57 @@
             background-color: rgba(231, 76, 60, 0.05);
         }
         
+        /* Phase 4: Benzersiz Kelime Sonuçları */
+        #phase4 .results-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .unique-results {
+            border-color: #3498db;
+        }
+        
+        .unique-results .results-title {
+            color: #2980b9;
+        }
+        
+        .unique-results .results-list li {
+            border-left-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+        }
+        
         /* Butonlar */
         .buttons {
             display: flex;
@@ -270,7 +384,12 @@
             color: white;
         }
         
-        .btn-success:hover, .btn-danger:hover, .btn-neutral:hover {
+        .btn-warning {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .btn-success:hover, .btn-danger:hover, .btn-neutral:hover, .btn-warning:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
@@ -428,6 +547,18 @@
                 padding: 10px 12px;
                 font-size: 0.95rem;
             }
+            
+            .mode-btn {
+                padding: 20px 15px;
+            }
+            
+            .mode-btn i {
+                font-size: 2rem;
+            }
+            
+            .mode-btn h3 {
+                font-size: 1.2rem;
+            }
         }
         
         @media (max-width: 480px) {
@@ -492,6 +623,23 @@
             .download-buttons {
                 grid-template-columns: 1fr;
                 gap: 10px;
+            }
+            
+            .mode-btn {
+                padding: 18px 12px;
+            }
+            
+            .mode-btn i {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+            }
+            
+            .mode-btn h3 {
+                font-size: 1.1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
             }
         }
         
@@ -575,6 +723,26 @@
                 color: #f0f0f0;
                 border-color: #4a4a5a;
             }
+            
+            .mode-btn {
+                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+            }
+            
+            .mode-btn h3 {
+                color: #f0f0f0;
+            }
+            
+            .mode-btn p {
+                color: #b0b0b0;
+            }
+            
+            .stat-box {
+                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+            }
+            
+            .stat-value {
+                color: #f0f0f0;
+            }
         }
         
         /* Sonuç mesajı */
@@ -613,6 +781,14 @@
             font-size: 0.9rem;
             line-height: 1.4;
         }
+        
+        /* Mod seçimi başlık */
+        .mode-select-title {
+            text-align: center;
+            margin: 20px 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -620,29 +796,57 @@
         <h1><i class="fas fa-filter"></i> Tabu Kelime Eleme</h1>
         
         <p class="app-description">
-            Tabu kelimelerinizi yazın, teker teker eleyin. Doğru bildikleriniz ve tekrar çalışılacaklar ayrılarak kaydedilebilir ve indirilebilir.
+            Tabu kelimelerinizi yazın, teker teker eleyin veya benzersiz kelimeleri listeleyin. İstediğiniz modu seçerek başlayın.
         </p>
         
-        <!-- Phase 1: Kelime Girişi -->
-        <div id="phase1" class="phase active">
-            <div class="instructions">
-                <h3><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h3>
-                <p>Tabu kelimelerinizi virgül (,) ile ayırarak yazın. Örnek: elma, armut, muz, çilek</p>
+        <!-- Phase 0: Mod Seçimi -->
+        <div id="phase0" class="phase active">
+            <h2 class="mode-select-title">Mod Seçin</h2>
+            
+            <div class="mode-selector">
+                <div id="mode1Btn" class="mode-btn active">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Kelime Eleme</h3>
+                    <p>Kelimeleri teker teker görüp, bildiklerinizi ve tekrar çalışacaklarınızı ayırın. Eleme yaparak öğrenin.</p>
+                </div>
+                
+                <div id="mode2Btn" class="mode-btn">
+                    <i class="fas fa-search"></i>
+                    <h3>Aynıları Bul</h3>
+                    <p>Tekrar eden kelimeleri bulun ve listeden çıkarın. Her kelimeden sadece bir tane kalacak şekilde benzersiz listeler oluşturun.</p>
+                </div>
             </div>
             
-            <textarea id="wordInput" placeholder="Örnek: elma, armut, muz, çilek, portakal, karpuz..."></textarea>
-            
-            <div class="buttons">
-                <button id="startBtn" class="btn btn-primary">
-                    <i class="fas fa-play"></i> Eleme Başla
-                </button>
-                <button id="exampleBtn" class="btn btn-neutral">
-                    <i class="fas fa-magic"></i> Örnek Yükle
+            <div class="buttons" style="margin-top: 30px;">
+                <button id="continueBtn" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i> Seçilen Mod ile Devam Et
                 </button>
             </div>
         </div>
         
-        <!-- Phase 2: Kelime Gösterme -->
+        <!-- Phase 1: Kelime Girişi -->
+        <div id="phase1" class="phase">
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h3>
+                <p>Tabu kelimelerinizi virgül (,) ile ayırarak yazın. Örnek: elma, armut, muz, çilek, elma, armut</p>
+            </div>
+            
+            <textarea id="wordInput" placeholder="Örnek: elma, armut, muz, çilek, elma, armut, portakal, muz..."></textarea>
+            
+            <div class="buttons">
+                <button id="startBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Başla
+                </button>
+                <button id="exampleBtn" class="btn btn-neutral">
+                    <i class="fas fa-magic"></i> Örnek Yükle
+                </button>
+                <button id="backToModeBtn" class="btn btn-neutral">
+                    <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
+                </button>
+            </div>
+        </div>
+        
+        <!-- Phase 2: Kelime Eleme (Mod 1) -->
         <div id="phase2" class="phase">
             <div class="progress-container">
                 <div class="progress-text">
@@ -686,7 +890,7 @@
             </div>
         </div>
         
-        <!-- Phase 3: Sonuçlar -->
+        <!-- Phase 3: Kelime Eleme Sonuçları -->
         <div id="phase3" class="phase">
             <h2>Tabu Eleme Sonuçları</h2>
             <p style="text-align: center; margin-bottom: 25px; color: #7f8c8d; font-size: 1.1rem;">
@@ -751,6 +955,61 @@
                 </button>
             </div>
         </div>
+        
+        <!-- Phase 4: Benzersiz Kelime Sonuçları (Mod 2) -->
+        <div id="phase4" class="phase">
+            <h2>Benzersiz Kelime Sonuçları</h2>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-value" id="originalCount">0</div>
+                    <div class="stat-label">Orijinal Kelime Sayısı</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="uniqueCount">0</div>
+                    <div class="stat-label">Benzersiz Kelime Sayısı</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="duplicateCount">0</div>
+                    <div class="stat-label">Çıkarılan Tekrar Sayısı</div>
+                </div>
+            </div>
+            
+            <div class="download-info">
+                <h4><i class="fas fa-download"></i> Sonuçları İndir</h4>
+                <p>Benzersiz kelime listesini aşağıdaki butonlardan indirebilirsiniz. İndirilen dosyaları not defteri veya Excel'de açabilirsiniz.</p>
+            </div>
+            
+            <div class="download-buttons">
+                <button id="downloadUniqueBtn" class="btn btn-download">
+                    <i class="fas fa-file-download"></i> Benzersiz Listeyi İndir
+                </button>
+                <button id="downloadDuplicatesBtn" class="btn btn-warning">
+                    <i class="fas fa-file-excel"></i> Tekrar Edenleri İndir
+                </button>
+            </div>
+            
+            <div class="results-container">
+                <div class="results-box unique-results">
+                    <h3 class="results-title">
+                        <i class="fas fa-search"></i> Benzersiz Kelimeler
+                        <span id="uniqueWordsCount">0</span>
+                    </h3>
+                    <ul id="uniqueList" class="results-list">
+                        <!-- Benzersiz kelimeler buraya eklenecek -->
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="restartUniqueBtn" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> Yeni Liste ile Başla
+                </button>
+                <button id="backToModeFromResultsBtn" class="btn btn-neutral">
+                    <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
+                </button>
+            </div>
+        </div>
     </div>
     
     <div class="footer">
@@ -764,14 +1023,24 @@
         let correctWords = [];
         let incorrectWords = [];
         let originalWords = [];
+        let currentMode = 1; // 1: Eleme modu, 2: Benzersiz kelime modu
+        let uniqueWords = [];
+        let duplicateWords = [];
+        let wordCountMap = new Map();
         
         // DOM elementlerini seçme
+        const phase0 = document.getElementById('phase0');
         const phase1 = document.getElementById('phase1');
         const phase2 = document.getElementById('phase2');
         const phase3 = document.getElementById('phase3');
+        const phase4 = document.getElementById('phase4');
         const wordInput = document.getElementById('wordInput');
+        const continueBtn = document.getElementById('continueBtn');
+        const mode1Btn = document.getElementById('mode1Btn');
+        const mode2Btn = document.getElementById('mode2Btn');
         const startBtn = document.getElementById('startBtn');
         const exampleBtn = document.getElementById('exampleBtn');
+        const backToModeBtn = document.getElementById('backToModeBtn');
         const currentWordElement = document.getElementById('currentWord');
         const correctBtn = document.getElementById('correctBtn');
         const incorrectBtn = document.getElementById('incorrectBtn');
@@ -793,20 +1062,33 @@
         const correctPercentageBar = document.getElementById('correctPercentageBar');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const downloadWrongBtn = document.getElementById('downloadWrongBtn');
+        const downloadUniqueBtn = document.getElementById('downloadUniqueBtn');
+        const downloadDuplicatesBtn = document.getElementById('downloadDuplicatesBtn');
+        const uniqueList = document.getElementById('uniqueList');
+        const originalCount = document.getElementById('originalCount');
+        const uniqueCount = document.getElementById('uniqueCount');
+        const duplicateCount = document.getElementById('duplicateCount');
+        const uniqueWordsCount = document.getElementById('uniqueWordsCount');
+        const restartUniqueBtn = document.getElementById('restartUniqueBtn');
+        const backToModeFromResultsBtn = document.getElementById('backToModeFromResultsBtn');
         
         // Başlangıç ayarları
         function initApp() {
             // Event listener'ları ekle
-            startBtn.addEventListener('click', startPractice);
+            continueBtn.addEventListener('click', continueToInput);
+            mode1Btn.addEventListener('click', () => selectMode(1));
+            mode2Btn.addEventListener('click', () => selectMode(2));
+            startBtn.addEventListener('click', startProcess);
             exampleBtn.addEventListener('click', loadExampleWords);
+            backToModeBtn.addEventListener('click', backToModeSelect);
             
-            // Cevap butonları
+            // Cevap butonları (Mod 1)
             correctBtn.addEventListener('click', () => handleAnswer(true));
             incorrectBtn.addEventListener('click', () => handleAnswer(false));
             bigCorrectBtn.addEventListener('click', () => handleAnswer(true));
             bigIncorrectBtn.addEventListener('click', () => handleAnswer(false));
             
-            // Diğer butonlar
+            // Diğer butonlar (Mod 1)
             pauseBtn.addEventListener('click', pausePractice);
             restartBtn.addEventListener('click', () => restartPractice(false));
             practiceWrongBtn.addEventListener('click', () => restartPractice(true));
@@ -815,6 +1097,12 @@
             // İndirme butonları
             downloadAllBtn.addEventListener('click', downloadAllResults);
             downloadWrongBtn.addEventListener('click', downloadWrongResults);
+            downloadUniqueBtn.addEventListener('click', downloadUniqueResults);
+            downloadDuplicatesBtn.addEventListener('click', downloadDuplicateResults);
+            
+            // Mod 2 butonları
+            restartUniqueBtn.addEventListener('click', newListForUnique);
+            backToModeFromResultsBtn.addEventListener('click', backToModeSelect);
             
             // Klavye kısayolları
             document.addEventListener('keydown', handleKeyDown);
@@ -826,20 +1114,75 @@
             loadExampleWords();
         }
         
+        // Mod seçimi
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Tüm mod butonlarının aktif sınıfını kaldır
+            mode1Btn.classList.remove('active');
+            mode2Btn.classList.remove('active');
+            
+            // Seçilen mod butonunu aktif yap
+            if (mode === 1) {
+                mode1Btn.classList.add('active');
+            } else {
+                mode2Btn.classList.add('active');
+            }
+        }
+        
+        // Mod seçiminden devam et
+        function continueToInput() {
+            // Faz değiştir
+            switchPhase(0, 1);
+            
+            // Moda göre placeholder güncelle
+            if (currentMode === 1) {
+                wordInput.placeholder = "Örnek: elma, armut, muz, çilek, elma, armut, portakal, muz...";
+            } else {
+                wordInput.placeholder = "Örnek: ahtapot, balık, yengeç, ahtapot, istakoz, balık, ahtapot...";
+            }
+            
+            wordInput.focus();
+        }
+        
+        // Mod seçimine dön
+        function backToModeSelect() {
+            // Faz değiştir
+            if (phase1.classList.contains('active')) {
+                switchPhase(1, 0);
+            } else if (phase3.classList.contains('active')) {
+                switchPhase(3, 0);
+            } else if (phase4.classList.contains('active')) {
+                switchPhase(4, 0);
+            }
+        }
+        
         // Örnek Tabu kelimelerini yükle
         function loadExampleWords() {
-            const exampleWords = [
-                "elma", "armut", "muz", "çilek", "portakal", "karpuz", "kavun",
-                "üzüm", "şeftali", "kayısı", "erik", "vişne", "kiraz", "nar",
-                "incir", "ayva", "limon", "greyfurt", "mandalina", "ananas"
-            ];
+            let exampleWords = [];
+            
+            if (currentMode === 1) {
+                // Eleme modu için örnek
+                exampleWords = [
+                    "elma", "armut", "muz", "çilek", "portakal", "karpuz", "kavun",
+                    "üzüm", "şeftali", "kayısı", "erik", "vişne", "kiraz", "nar",
+                    "incir", "ayva", "limon", "greyfurt", "mandalina", "ananas"
+                ];
+            } else {
+                // Benzersiz kelime modu için örnek (tekrar eden kelimeler içeren)
+                exampleWords = [
+                    "ahtapot", "balık", "yengeç", "ahtapot", "istakoz", "balık", 
+                    "ahtapot", "karides", "midye", "yengeç", "balina", "köpekbalığı",
+                    "midye", "ahtapot", "yunus", "balık", "istakoz", "karides"
+                ];
+            }
             
             wordInput.value = exampleWords.join(', ');
             wordInput.focus();
         }
         
-        // Uygulamayı başlat
-        function startPractice() {
+        // İşlemi başlat (moda göre)
+        function startProcess() {
             // Kelimeleri al ve temizle
             const input = wordInput.value.trim();
             if (!input) {
@@ -861,7 +1204,18 @@
             // Orijinal listeyi sakla (yeniden başlatma için)
             originalWords = [...allWords];
             
-            // Karıştır
+            if (currentMode === 1) {
+                // Eleme modu
+                startElemeMode();
+            } else {
+                // Benzersiz kelime modu
+                startUniqueMode();
+            }
+        }
+        
+        // Eleme modunu başlat
+        function startElemeMode() {
+            // Kelimeleri karıştır
             allWords = shuffleArray(allWords);
             
             // Sıfırla
@@ -874,6 +1228,44 @@
             
             // İlk kelimeyi göster
             showCurrentWord();
+        }
+        
+        // Benzersiz kelime modunu başlat
+        function startUniqueMode() {
+            // Kelime sayılarını hesapla
+            wordCountMap.clear();
+            duplicateWords = [];
+            uniqueWords = [];
+            
+            // Her kelimenin kaç kez tekrar ettiğini say
+            allWords.forEach(word => {
+                const lowerWord = word.toLowerCase();
+                const count = wordCountMap.get(lowerWord) || 0;
+                wordCountMap.set(lowerWord, count + 1);
+            });
+            
+            // Benzersiz ve tekrar eden kelimeleri ayır
+            wordCountMap.forEach((count, word) => {
+                const formattedWord = word.charAt(0).toUpperCase() + word.slice(1);
+                
+                if (count === 1) {
+                    uniqueWords.push(formattedWord);
+                } else {
+                    duplicateWords.push(`${formattedWord} (${count} kez)`);
+                    
+                    // Benzersiz listeye de ekle (sadece 1 kez)
+                    uniqueWords.push(formattedWord);
+                }
+            });
+            
+            // Benzersiz kelimeleri alfabetik sırala
+            uniqueWords.sort((a, b) => a.localeCompare(b, 'tr'));
+            
+            // Faz değiştir
+            switchPhase(1, 4);
+            
+            // Sonuçları göster
+            displayUniqueResults();
         }
         
         // Faz değiştirme (animasyonlu)
@@ -897,7 +1289,7 @@
             return shuffled;
         }
         
-        // Mevcut kelimeyi göster
+        // Mevcut kelimeyi göster (Mod 1)
         function showCurrentWord() {
             if (currentWordIndex < allWords.length) {
                 currentWordElement.textContent = allWords[currentWordIndex];
@@ -920,14 +1312,14 @@
             }
         }
         
-        // İlerlemeyi güncelle
+        // İlerlemeyi güncelle (Mod 1)
         function updateProgress() {
             const progress = ((currentWordIndex + 1) / allWords.length) * 100;
             progressFill.style.width = `${progress}%`;
             progressText.textContent = `${currentWordIndex + 1}/${allWords.length}`;
         }
         
-        // Cevabı işle
+        // Cevabı işle (Mod 1)
         function handleAnswer(isCorrect) {
             const currentWord = allWords[currentWordIndex];
             
@@ -956,7 +1348,7 @@
             }, 200);
         }
         
-        // Uygulamayı durdur
+        // Uygulamayı durdur (Mod 1)
         function pausePractice() {
             if (allWords.length > 0 && (correctWords.length + incorrectWords.length < allWords.length)) {
                 if (confirm('Elemeyi durdurup sonuçları görmek istediğinize emin misiniz?')) {
@@ -967,7 +1359,7 @@
             }
         }
         
-        // Uygulamayı bitir
+        // Uygulamayı bitir (Mod 1)
         function finishPractice() {
             // Eksik kelimeleri incorrectWords'e ekle (yarıda bırakıldıysa)
             if (currentWordIndex < allWords.length) {
@@ -985,7 +1377,7 @@
             displayResults();
         }
         
-        // Sonuçları göster
+        // Sonuçları göster (Mod 1)
         function displayResults() {
             // Toplam kelime sayısı
             const total = allWords.length;
@@ -1044,7 +1436,49 @@
             phase3.insertBefore(messageElem, buttonsContainer);
         }
         
-        // Uygulamayı yeniden başlat
+        // Benzersiz kelime sonuçlarını göster (Mod 2)
+        function displayUniqueResults() {
+            // İstatistikleri güncelle
+            const original = allWords.length;
+            const unique = uniqueWords.length;
+            const duplicates = original - unique;
+            
+            originalCount.textContent = original;
+            uniqueCount.textContent = unique;
+            duplicateCount.textContent = duplicates;
+            uniqueWordsCount.textContent = unique;
+            
+            // Benzersiz kelimeleri listele
+            uniqueList.innerHTML = '';
+            uniqueWords.forEach(word => {
+                const li = document.createElement('li');
+                li.textContent = word;
+                uniqueList.appendChild(li);
+            });
+            
+            // Bilgi mesajı
+            const existingMessage = phase4.querySelector('.result-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            let message = '';
+            if (duplicates === 0) {
+                message = '<i class="fas fa-check-circle"></i> Listenizde hiç tekrar eden kelime yok!';
+            } else {
+                message = `<i class="fas fa-filter"></i> ${duplicates} adet tekrar eden kelime çıkarıldı.`;
+            }
+            
+            const messageElem = document.createElement('p');
+            messageElem.className = 'result-message';
+            messageElem.style.cssText = 'text-align:center; padding:15px; margin:20px auto; background:linear-gradient(135deg, #3498db, #2980b9); color:white; border-radius:10px; max-width:400px; font-weight:bold;';
+            messageElem.innerHTML = message;
+            
+            const buttonsContainer = phase4.querySelector('.buttons');
+            phase4.insertBefore(messageElem, buttonsContainer);
+        }
+        
+        // Uygulamayı yeniden başlat (Mod 1)
         function restartPractice(onlyWrong = false) {
             let wordsToPractice = [];
             
@@ -1076,7 +1510,7 @@
             showCurrentWord();
         }
         
-        // Yeni liste ile başla
+        // Yeni liste ile başla (Mod 1)
         function newList() {
             // Faz değiştir
             switchPhase(3, 1);
@@ -1086,7 +1520,17 @@
             wordInput.focus();
         }
         
-        // Tüm sonuçları indir
+        // Yeni liste ile başla (Mod 2)
+        function newListForUnique() {
+            // Faz değiştir
+            switchPhase(4, 1);
+            
+            // Input'u temizle
+            wordInput.value = '';
+            wordInput.focus();
+        }
+        
+        // Tüm sonuçları indir (Mod 1)
         function downloadAllResults() {
             if (correctWords.length === 0 && incorrectWords.length === 0) {
                 alert('İndirilecek sonuç bulunamadı!');
@@ -1123,7 +1567,7 @@
             downloadFile(content, fileName, 'text/plain');
         }
         
-        // Sadece tekrar çalışılacakları indir
+        // Sadece tekrar çalışılacakları indir (Mod 1)
         function downloadWrongResults() {
             if (incorrectWords.length === 0) {
                 alert('Tekrar çalışılacak kelime bulunamadı!');
@@ -1147,6 +1591,66 @@
             
             // Dosya adı
             const fileName = `tabu-tekrar-calisilacaklar-${dateStr}-${timeStr}.txt`;
+            
+            // Dosyayı indir
+            downloadFile(content, fileName, 'text/plain');
+        }
+        
+        // Benzersiz kelimeleri indir (Mod 2)
+        function downloadUniqueResults() {
+            if (uniqueWords.length === 0) {
+                alert('Benzersiz kelime bulunamadı!');
+                return;
+            }
+            
+            // Tarih ve saat bilgisi
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
+            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
+            
+            // Metin içeriği oluştur
+            let content = `Tabu Benzersiz Kelime Listesi\n`;
+            content += `Tarih: ${dateStr} ${timeStr}\n`;
+            content += `Orijinal Kelime Sayısı: ${allWords.length}\n`;
+            content += `Benzersiz Kelime Sayısı: ${uniqueWords.length}\n`;
+            content += `Çıkarılan Tekrar Sayısı: ${allWords.length - uniqueWords.length}\n\n`;
+            
+            content += `=== BENZERSİZ KELİMELER ===\n`;
+            uniqueWords.forEach((word, index) => {
+                content += `${index + 1}. ${word}\n`;
+            });
+            
+            // Dosya adı
+            const fileName = `tabu-benzersiz-kelimeler-${dateStr}-${timeStr}.txt`;
+            
+            // Dosyayı indir
+            downloadFile(content, fileName, 'text/plain');
+        }
+        
+        // Tekrar eden kelimeleri indir (Mod 2)
+        function downloadDuplicateResults() {
+            if (duplicateWords.length === 0) {
+                alert('Tekrar eden kelime bulunamadı!');
+                return;
+            }
+            
+            // Tarih ve saat bilgisi
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
+            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
+            
+            // Metin içeriği oluştur
+            let content = `Tabu Tekrar Eden Kelimeler\n`;
+            content += `Tarih: ${dateStr} ${timeStr}\n`;
+            content += `Toplam Tekrar Eden Kelime: ${duplicateWords.length}\n\n`;
+            
+            content += `=== TEKRAR EDEN KELİMELER ===\n`;
+            duplicateWords.forEach((word, index) => {
+                content += `${index + 1}. ${word}\n`;
+            });
+            
+            // Dosya adı
+            const fileName = `tabu-tekrar-edenler-${dateStr}-${timeStr}.txt`;
             
             // Dosyayı indir
             downloadFile(content, fileName, 'text/plain');
@@ -1246,7 +1750,7 @@
         
         // Klavye kısayolları
         function handleKeyDown(e) {
-            // Sadece phase2'deyken klavye kısayolları çalışsın
+            // Sadece phase2'deyken klavye kısayolları çalışsın (Mod 1)
             if (!phase2.classList.contains('active')) return;
             
             switch(e.key) {
@@ -1292,7 +1796,7 @@
             }, { passive: true });
             
             document.addEventListener('touchend', (e) => {
-                // Sadece phase2'deyken swipe çalışsın
+                // Sadece phase2'deyken swipe çalışsın (Mod 1)
                 if (!phase2.classList.contains('active')) return;
                 
                 const endX = e.changedTouches[0].clientX;
@@ -1319,15 +1823,6 @@
         
         // Sayfa yüklendiğinde uygulamayı başlat
         document.addEventListener('DOMContentLoaded', initApp);
-        
-        // PWA için: Sayfanın çevrimdışı çalışmasını sağla
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
     </script>
 </body>
 </html>
