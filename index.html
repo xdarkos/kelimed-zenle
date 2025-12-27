@@ -1,1828 +1,1474 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tabu Kelime Eleme Uygulaması</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
-            color: #333;
-            min-height: 100vh;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background-color: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            padding: 25px 20px;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 2rem;
-            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .app-description {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 25px;
-            font-size: 1rem;
-            line-height: 1.5;
-            padding: 0 10px;
-        }
-        
-        .phase {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        
-        .phase.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Mode seçim butonları */
-        .mode-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .mode-selector {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-        }
-        
-        .mode-btn {
-            padding: 25px 20px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 3px solid transparent;
-        }
-        
-        .mode-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        .mode-btn:active {
-            transform: translateY(-2px);
-        }
-        
-        .mode-btn.active {
-            border-color: #ff6b6b;
-            background: linear-gradient(135deg, #ffefef 0%, #e9ecef 100%);
-        }
-        
-        .mode-btn i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #ff6b6b;
-        }
-        
-        .mode-btn h3 {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .mode-btn p {
-            font-size: 0.95rem;
-            color: #7f8c8d;
-            line-height: 1.4;
-        }
-        
-        /* Phase 1: Kelime Girişi */
-        #phase1 textarea {
-            width: 100%;
-            height: 180px;
-            padding: 15px;
-            font-size: 1.1rem;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            resize: vertical;
-            margin-bottom: 20px;
-            transition: border 0.3s;
-            line-height: 1.4;
-        }
-        
-        #phase1 textarea:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-        }
-        
-        /* Phase 2: Kelime Gösterme */
-        .word-display {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .current-word {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            padding: 25px 15px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            line-height: 1.3;
-        }
-        
-        .counter {
-            font-size: 1.1rem;
-            color: #7f8c8d;
-            margin-top: 15px;
-            font-weight: 600;
-        }
-        
-        /* Phase 3: Sonuçlar */
-        .results-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .results-container {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
-        }
-        
-        .results-box {
-            background-color: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-top: 5px solid;
-            height: 100%;
-        }
-        
-        .correct-results {
-            border-color: #2ecc71;
-        }
-        
-        .incorrect-results {
-            border-color: #e74c3c;
-        }
-        
-        .results-title {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        
-        .correct-results .results-title {
-            color: #27ae60;
-        }
-        
-        .incorrect-results .results-title {
-            color: #c0392b;
-        }
-        
-        .results-list {
-            list-style-type: none;
-            max-height: 250px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-        
-        /* Scrollbar stilleri */
-        .results-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .results-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .results-list::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
-        
-        .results-list li {
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            background-color: white;
-            border-radius: 10px;
-            border-left: 4px solid;
-            font-size: 1rem;
-            word-break: break-word;
-        }
-        
-        .correct-results .results-list li {
-            border-left-color: #2ecc71;
-            background-color: rgba(46, 204, 113, 0.05);
-        }
-        
-        .incorrect-results .results-list li {
-            border-left-color: #e74c3c;
-            background-color: rgba(231, 76, 60, 0.05);
-        }
-        
-        /* Phase 4: Benzersiz Kelime Sonuçları */
-        #phase4 .results-container {
-            grid-template-columns: 1fr;
-        }
-        
-        .unique-results {
-            border-color: #3498db;
-        }
-        
-        .unique-results .results-title {
-            color: #2980b9;
-        }
-        
-        .unique-results .results-list li {
-            border-left-color: #3498db;
-            background-color: rgba(52, 152, 219, 0.05);
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        @media (max-width: 768px) {
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .stat-box {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .stat-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.95rem;
-            color: #7f8c8d;
-        }
-        
-        /* Butonlar */
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 16px 24px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            min-width: 160px;
-            flex: 1;
-            max-width: 280px;
-            touch-action: manipulation;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-success {
-            background: linear-gradient(to right, #2ecc71, #27ae60);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(to right, #e74c3c, #c0392b);
-            color: white;
-        }
-        
-        .btn-neutral {
-            background: linear-gradient(to right, #95a5a6, #7f8c8d);
-            color: white;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(to right, #f39c12, #e67e22);
-            color: white;
-        }
-        
-        .btn-success:hover, .btn-danger:hover, .btn-neutral:hover, .btn-warning:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* İndirme butonu */
-        .btn-download {
-            background: linear-gradient(to right, #3498db, #2980b9);
-            color: white;
-        }
-        
-        .btn-download:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Progress Bar */
-        .progress-container {
-            margin: 25px 0;
-        }
-        
-        .progress-bar {
-            height: 12px;
-            background-color: #ecf0f1;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff6b6b, #4ecdc4);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 6px;
-        }
-        
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.95rem;
-        }
-        
-        /* Footer */
-        .footer {
-            margin-top: 25px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.85rem;
-            padding: 10px;
-            width: 100%;
-            max-width: 900px;
-        }
-        
-        /* Mobil özel butonlar */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .big-action-btn {
-            height: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 20px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .big-action-btn:active {
-            transform: scale(0.97);
-        }
-        
-        .big-action-btn i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .big-correct {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-        
-        .big-incorrect {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-        
-        /* İndirme butonları konteyneri */
-        .download-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .download-buttons {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Responsive ayarlamalar */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-                border-radius: 18px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-                margin-bottom: 12px;
-            }
-            
-            .app-description {
-                font-size: 0.95rem;
-                margin-bottom: 20px;
-            }
-            
-            .current-word {
-                font-size: 2.2rem;
-                min-height: 130px;
-                padding: 20px 15px;
-                margin-bottom: 20px;
-            }
-            
-            .btn {
-                padding: 14px 20px;
-                font-size: 1rem;
-                min-width: 140px;
-            }
-            
-            .buttons {
-                gap: 12px;
-            }
-            
-            .results-box {
-                padding: 18px;
-            }
-            
-            .results-title {
-                font-size: 1.2rem;
-            }
-            
-            .results-list li {
-                padding: 10px 12px;
-                font-size: 0.95rem;
-            }
-            
-            .mode-btn {
-                padding: 20px 15px;
-            }
-            
-            .mode-btn i {
-                font-size: 2rem;
-            }
-            
-            .mode-btn h3 {
-                font-size: 1.2rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-                justify-content: flex-start;
-                min-height: 100vh;
-            }
-            
-            .container {
-                padding: 18px 12px;
-                border-radius: 16px;
-                margin-top: 10px;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .current-word {
-                font-size: 1.9rem;
-                min-height: 110px;
-                padding: 18px 12px;
-                margin: 20px 0;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 100%;
-                padding: 16px;
-                margin: 0;
-            }
-            
-            .buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .action-buttons {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-            
-            .big-action-btn {
-                height: 110px;
-                font-size: 1.1rem;
-            }
-            
-            .big-action-btn i {
-                font-size: 2.2rem;
-            }
-            
-            #phase1 textarea {
-                height: 150px;
-                font-size: 1rem;
-            }
-            
-            .progress-text {
-                font-size: 0.9rem;
-            }
-            
-            .download-buttons {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .mode-btn {
-                padding: 18px 12px;
-            }
-            
-            .mode-btn i {
-                font-size: 1.8rem;
-                margin-bottom: 10px;
-            }
-            
-            .mode-btn h3 {
-                font-size: 1.1rem;
-            }
-            
-            .stat-value {
-                font-size: 1.8rem;
-            }
-        }
-        
-        /* Çok küçük ekranlar için */
-        @media (max-width: 350px) {
-            .current-word {
-                font-size: 1.7rem;
-                min-height: 100px;
-            }
-            
-            .big-action-btn {
-                height: 100px;
-                font-size: 1rem;
-            }
-            
-            .big-action-btn i {
-                font-size: 2rem;
-            }
-            
-            h1 {
-                font-size: 1.4rem;
-            }
-        }
-        
-        .instructions {
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ff6b6b;
-        }
-        
-        .instructions h3 {
-            color: #ff6b6b;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .instructions p {
-            color: #555;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        
-        /* Swipe animasyonları */
-        .word-animation {
-            animation: wordAppear 0.4s ease-out;
-        }
-        
-        @keyframes wordAppear {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        
-        /* Dark mode desteği */
-        @media (prefers-color-scheme: dark) {
-            .container {
-                background-color: rgba(30, 30, 40, 0.95);
-                color: #f0f0f0;
-            }
-            
-            .current-word {
-                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
-                color: #f0f0f0;
-            }
-            
-            .results-box {
-                background-color: #2a2a3a;
-            }
-            
-            .results-list li {
-                background-color: #3a3a4a;
-                color: #f0f0f0;
-            }
-            
-            #phase1 textarea {
-                background-color: #2a2a3a;
-                color: #f0f0f0;
-                border-color: #4a4a5a;
-            }
-            
-            .mode-btn {
-                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
-            }
-            
-            .mode-btn h3 {
-                color: #f0f0f0;
-            }
-            
-            .mode-btn p {
-                color: #b0b0b0;
-            }
-            
-            .stat-box {
-                background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
-            }
-            
-            .stat-value {
-                color: #f0f0f0;
-            }
-        }
-        
-        /* Sonuç mesajı */
-        .result-message {
-            text-align: center;
-            padding: 15px;
-            margin: 20px auto;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-            color: white;
-            border-radius: 10px;
-            max-width: 400px;
-            font-weight: bold;
-        }
-        
-        /* İndirme bilgi mesajı */
-        .download-info {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .download-info h4 {
-            color: #3498db;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .download-info p {
-            color: #555;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        
-        /* Mod seçimi başlık */
-        .mode-select-title {
-            text-align: center;
-            margin: 20px 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tabu Kelime Eleme Uygulaması</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color:transparent; }
+    body{
+      background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+      color:#333;
+      min-height:100vh;
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      touch-action:manipulation;
+    }
+    .container{
+      width:100%;
+      max-width:900px;
+      background-color: rgba(255,255,255,0.98);
+      border-radius:20px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.15);
+      overflow:hidden;
+      padding:25px 20px;
+    }
+    h1{
+      text-align:center;
+      color:#2c3e50;
+      margin-bottom:15px;
+      font-size:2rem;
+      background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      padding-bottom:10px;
+      border-bottom:2px solid #f0f0f0;
+    }
+    .app-description{
+      text-align:center;
+      color:#7f8c8d;
+      margin-bottom:25px;
+      font-size:1rem;
+      line-height:1.5;
+      padding:0 10px;
+    }
+
+    .phase{ display:none; animation: fadeIn .35s ease; }
+    .phase.active{ display:block; }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    .mode-selector{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      margin-top:20px;
+    }
+    @media (max-width:768px){
+      .mode-selector{ grid-template-columns:1fr; gap:15px; }
+    }
+    .mode-btn{
+      padding:25px 20px;
+      border:none;
+      border-radius:15px;
+      cursor:pointer;
+      transition: all .25s ease;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      box-shadow:0 8px 20px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border:3px solid transparent;
+      user-select:none;
+    }
+    .mode-btn:hover{ transform: translateY(-4px); box-shadow:0 12px 25px rgba(0,0,0,0.15); }
+    .mode-btn:active{ transform: translateY(-2px); }
+    .mode-btn.active{ border-color:#ff6b6b; background: linear-gradient(135deg, #ffefef 0%, #e9ecef 100%); }
+    .mode-btn i{ font-size:2.5rem; margin-bottom:15px; color:#ff6b6b; }
+    .mode-btn h3{ font-size:1.4rem; margin-bottom:10px; color:#2c3e50; }
+    .mode-btn p{ font-size:.95rem; color:#7f8c8d; line-height:1.4; }
+
+    #phase1 textarea{
+      width:100%;
+      height:180px;
+      padding:15px;
+      font-size:1.1rem;
+      border:2px solid #ddd;
+      border-radius:12px;
+      resize:vertical;
+      margin-bottom:20px;
+      transition:border .2s;
+      line-height:1.4;
+    }
+    #phase1 textarea:focus{
+      outline:none;
+      border-color:#ff6b6b;
+      box-shadow:0 0 0 3px rgba(255,107,107,0.1);
+    }
+
+    .word-display{ text-align:center; margin:30px 0; }
+    .current-word{
+      font-size:2.5rem;
+      font-weight:700;
+      color:#2c3e50;
+      margin-bottom:25px;
+      padding:25px 15px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius:15px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+      min-height:140px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      word-break:break-word;
+      overflow-wrap:break-word;
+      line-height:1.3;
+    }
+    .counter{ font-size:1.1rem; color:#7f8c8d; margin-top:15px; font-weight:600; }
+
+    .results-container{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      margin-top:20px;
+    }
+    @media (max-width:768px){
+      .results-container{ grid-template-columns:1fr; gap:25px; }
+    }
+    .results-box{
+      background-color:#f8f9fa;
+      border-radius:15px;
+      padding:20px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05);
+      border-top:5px solid;
+      height:100%;
+    }
+    .correct-results{ border-color:#2ecc71; }
+    .incorrect-results{ border-color:#e74c3c; }
+    .unique-results{ border-color:#3498db; }
+    .duplicate-results{ border-color:#f39c12; }
+
+    .results-title{
+      font-size:1.3rem;
+      margin-bottom:15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .correct-results .results-title{ color:#27ae60; }
+    .incorrect-results .results-title{ color:#c0392b; }
+    .unique-results .results-title{ color:#2980b9; }
+    .duplicate-results .results-title{ color:#e67e22; }
+
+    .results-list{
+      list-style-type:none;
+      max-height:260px;
+      overflow-y:auto;
+      padding-right:5px;
+    }
+    .results-list::-webkit-scrollbar{ width:6px; }
+    .results-list::-webkit-scrollbar-track{ background:#f1f1f1; border-radius:10px; }
+    .results-list::-webkit-scrollbar-thumb{ background:#ccc; border-radius:10px; }
+
+    .results-list li{
+      padding:12px 15px;
+      margin-bottom:10px;
+      background-color:white;
+      border-radius:10px;
+      border-left:4px solid;
+      font-size:1rem;
+      word-break:break-word;
+    }
+    .correct-results .results-list li{ border-left-color:#2ecc71; background-color: rgba(46,204,113,0.05); }
+    .incorrect-results .results-list li{ border-left-color:#e74c3c; background-color: rgba(231,76,60,0.05); }
+    .unique-results .results-list li{ border-left-color:#3498db; background-color: rgba(52,152,219,0.05); }
+    .duplicate-results .results-list li{ border-left-color:#f39c12; background-color: rgba(243,156,18,0.06); }
+
+    #phase4 .results-container{ grid-template-columns:1fr; }
+
+    .stats-container{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:15px;
+      margin-bottom:25px;
+    }
+    @media (max-width:768px){ .stats-container{ grid-template-columns:1fr; } }
+    .stat-box{
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding:20px;
+      border-radius:12px;
+      text-align:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05);
+    }
+    .stat-value{ font-size:2.2rem; font-weight:700; color:#2c3e50; margin-bottom:5px; }
+    .stat-label{ font-size:0.95rem; color:#7f8c8d; }
+
+    .buttons{
+      display:flex;
+      justify-content:center;
+      gap:15px;
+      margin-top:30px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:16px 24px;
+      font-size:1.1rem;
+      border:none;
+      border-radius:50px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: all .25s ease;
+      font-weight:600;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+      min-width:160px;
+      flex:1;
+      max-width:280px;
+      touch-action: manipulation;
+      user-select:none;
+    }
+    .btn:active{ transform: scale(0.985); }
+    .btn-primary{ background: linear-gradient(to right, #ff6b6b, #4ecdc4); color:white; }
+    .btn-success{ background: linear-gradient(to right, #2ecc71, #27ae60); color:white; }
+    .btn-danger{ background: linear-gradient(to right, #e74c3c, #c0392b); color:white; }
+    .btn-neutral{ background: linear-gradient(to right, #95a5a6, #7f8c8d); color:white; }
+    .btn-warning{ background: linear-gradient(to right, #f39c12, #e67e22); color:white; }
+    .btn-download{ background: linear-gradient(to right, #3498db, #2980b9); color:white; }
+    .btn:hover{ transform: translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+
+    .btn-copy{ background: linear-gradient(to right, #8e44ad, #6c5ce7); color:white; }
+    .btn-copy:hover{ transform: translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
+
+    .progress-container{ margin:25px 0; }
+    .progress-bar{
+      height:12px;
+      background-color:#ecf0f1;
+      border-radius:6px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+    .progress-fill{
+      height:100%;
+      background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+      width:0%;
+      transition: width .4s ease;
+      border-radius:6px;
+    }
+    .progress-text{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:5px;
+      font-weight:600;
+      color:#2c3e50;
+      font-size:0.95rem;
+    }
+
+    .footer{
+      margin-top:25px;
+      text-align:center;
+      color: rgba(255,255,255,0.85);
+      font-size:0.85rem;
+      padding:10px;
+      width:100%;
+      max-width:900px;
+    }
+
+    .action-buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-top:20px;
+    }
+    .big-action-btn{
+      height:120px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border-radius:20px;
+      font-size:1.3rem;
+      font-weight:bold;
+      border:none;
+      color:white;
+      cursor:pointer;
+      transition: all .2s ease;
+      box-shadow:0 8px 20px rgba(0,0,0,0.15);
+      user-select:none;
+    }
+    .big-action-btn:active{ transform: scale(0.97); }
+    .big-action-btn i{ font-size:2.5rem; margin-bottom:10px; }
+    .big-correct{ background: linear-gradient(135deg, #2ecc71, #27ae60); }
+    .big-incorrect{ background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+    .download-buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-top:20px;
+    }
+    @media (max-width:768px){ .download-buttons{ grid-template-columns:1fr; } }
+
+    .copy-buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+      margin-top:14px;
+    }
+    @media (max-width:768px){ .copy-buttons{ grid-template-columns:1fr; } }
+
+    @media (max-width:768px){
+      .container{ padding:20px 15px; border-radius:18px; }
+      h1{ font-size:1.8rem; margin-bottom:12px; }
+      .app-description{ font-size:0.95rem; margin-bottom:20px; }
+      .current-word{ font-size:2.2rem; min-height:130px; padding:20px 15px; margin-bottom:20px; }
+      .btn{ padding:14px 20px; font-size:1rem; min-width:140px; }
+      .buttons{ gap:12px; }
+      .results-box{ padding:18px; }
+      .results-title{ font-size:1.2rem; }
+      .results-list li{ padding:10px 12px; font-size:0.95rem; }
+      .mode-btn{ padding:20px 15px; }
+      .mode-btn i{ font-size:2rem; }
+      .mode-btn h3{ font-size:1.2rem; }
+    }
+    @media (max-width:480px){
+      body{ padding:10px; justify-content:flex-start; min-height:100vh; }
+      .container{ padding:18px 12px; border-radius:16px; margin-top:10px; }
+      h1{ font-size:1.6rem; }
+      .current-word{ font-size:1.9rem; min-height:110px; padding:18px 12px; margin:20px 0; }
+      .btn{ width:100%; max-width:100%; padding:16px; margin:0; }
+      .buttons{ flex-direction:column; gap:10px; }
+      .action-buttons{ gap:12px; }
+      .big-action-btn{ height:110px; font-size:1.1rem; }
+      .big-action-btn i{ font-size:2.2rem; }
+      #phase1 textarea{ height:150px; font-size:1rem; }
+      .progress-text{ font-size:0.9rem; }
+      .download-buttons{ grid-template-columns:1fr; gap:10px; }
+      .stat-value{ font-size:1.8rem; }
+    }
+    @media (max-width:350px){
+      .current-word{ font-size:1.7rem; min-height:100px; }
+      .big-action-btn{ height:100px; font-size:1rem; }
+      .big-action-btn i{ font-size:2rem; }
+      h1{ font-size:1.4rem; }
+    }
+
+    .instructions{
+      background-color:#f8f9fa;
+      border-radius:12px;
+      padding:15px;
+      margin-bottom:20px;
+      border-left:4px solid #ff6b6b;
+    }
+    .instructions h3{
+      color:#ff6b6b;
+      margin-bottom:8px;
+      font-size:1.1rem;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .instructions p{ color:#555; font-size:0.95rem; line-height:1.5; }
+
+    .word-animation{ animation: wordAppear .35s ease-out; }
+    @keyframes wordAppear{
+      0%{ opacity:0; transform:scale(0.92); }
+      100%{ opacity:1; transform:scale(1); }
+    }
+
+    @media (prefers-color-scheme: dark){
+      .container{ background-color: rgba(30,30,40,0.95); color:#f0f0f0; }
+      .current-word{ background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%); color:#f0f0f0; }
+      .results-box{ background-color:#2a2a3a; }
+      .results-list li{ background-color:#3a3a4a; color:#f0f0f0; }
+      #phase1 textarea{ background-color:#2a2a3a; color:#f0f0f0; border-color:#4a4a5a; }
+      .mode-btn{ background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%); }
+      .mode-btn h3{ color:#f0f0f0; }
+      .mode-btn p{ color:#b0b0b0; }
+      .stat-box{ background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%); }
+      .stat-value{ color:#f0f0f0; }
+      .instructions{ background-color:#2a2a3a; }
+      .instructions p{ color:#d0d0d0; }
+      .download-info{ background-color:#2a2a3a; }
+      .download-info p{ color:#d0d0d0; }
+    }
+
+    .result-message{
+      text-align:center;
+      padding:15px;
+      margin:20px auto;
+      color:white;
+      border-radius:10px;
+      max-width:480px;
+      font-weight:bold;
+    }
+
+    .download-info{
+      text-align:center;
+      margin-top:20px;
+      padding:15px;
+      background-color:#f8f9fa;
+      border-radius:10px;
+      border-left:4px solid #3498db;
+    }
+    .download-info h4{
+      color:#3498db;
+      margin-bottom:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .download-info p{
+      color:#555;
+      font-size:0.9rem;
+      line-height:1.4;
+    }
+
+    .mode-select-title{
+      text-align:center;
+      margin:20px 0;
+      color:#2c3e50;
+      font-size:1.5rem;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1><i class="fas fa-filter"></i> Tabu Kelime Eleme</h1>
-        
-        <p class="app-description">
-            Tabu kelimelerinizi yazın, teker teker eleyin veya benzersiz kelimeleri listeleyin. İstediğiniz modu seçerek başlayın.
-        </p>
-        
-        <!-- Phase 0: Mod Seçimi -->
-        <div id="phase0" class="phase active">
-            <h2 class="mode-select-title">Mod Seçin</h2>
-            
-            <div class="mode-selector">
-                <div id="mode1Btn" class="mode-btn active">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Kelime Eleme</h3>
-                    <p>Kelimeleri teker teker görüp, bildiklerinizi ve tekrar çalışacaklarınızı ayırın. Eleme yaparak öğrenin.</p>
-                </div>
-                
-                <div id="mode2Btn" class="mode-btn">
-                    <i class="fas fa-search"></i>
-                    <h3>Aynıları Bul</h3>
-                    <p>Tekrar eden kelimeleri bulun ve listeden çıkarın. Her kelimeden sadece bir tane kalacak şekilde benzersiz listeler oluşturun.</p>
-                </div>
-            </div>
-            
-            <div class="buttons" style="margin-top: 30px;">
-                <button id="continueBtn" class="btn btn-primary">
-                    <i class="fas fa-arrow-right"></i> Seçilen Mod ile Devam Et
-                </button>
-            </div>
+  <div class="container">
+    <h1><i class="fas fa-filter"></i> Tabu Kelime Eleme</h1>
+
+    <p class="app-description">
+      Tabu kelimelerinizi yazın, teker teker eleyin veya tekrar edenleri temizleyip benzersiz liste oluşturun.
+      İstediğiniz modu seçerek başlayın.
+    </p>
+
+    <!-- Phase 0: Mod Seçimi -->
+    <div id="phase0" class="phase active">
+      <h2 class="mode-select-title">Mod Seçin</h2>
+
+      <div class="mode-selector">
+        <div id="mode1Btn" class="mode-btn active" role="button" tabindex="0">
+          <i class="fas fa-check-circle"></i>
+          <h3>Kelime Eleme</h3>
+          <p>Kelimeleri tek tek görüp “Biliyorum / Tekrar Çalış” olarak ayırın. (Girdi sırası korunur.)</p>
         </div>
-        
-        <!-- Phase 1: Kelime Girişi -->
-        <div id="phase1" class="phase">
-            <div class="instructions">
-                <h3><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h3>
-                <p>Tabu kelimelerinizi virgül (,) ile ayırarak yazın. Örnek: elma, armut, muz, çilek, elma, armut</p>
-            </div>
-            
-            <textarea id="wordInput" placeholder="Örnek: elma, armut, muz, çilek, elma, armut, portakal, muz..."></textarea>
-            
-            <div class="buttons">
-                <button id="startBtn" class="btn btn-primary">
-                    <i class="fas fa-play"></i> Başla
-                </button>
-                <button id="exampleBtn" class="btn btn-neutral">
-                    <i class="fas fa-magic"></i> Örnek Yükle
-                </button>
-                <button id="backToModeBtn" class="btn btn-neutral">
-                    <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
-                </button>
-            </div>
+
+        <div id="mode2Btn" class="mode-btn" role="button" tabindex="0">
+          <i class="fas fa-search"></i>
+          <h3>Aynıları Bul</h3>
+          <p>Büyük/küçük fark etmeksizin TAM eşleşmeyle tekrar edenleri tespit edip benzersiz liste üretin.</p>
         </div>
-        
-        <!-- Phase 2: Kelime Eleme (Mod 1) -->
-        <div id="phase2" class="phase">
-            <div class="progress-container">
-                <div class="progress-text">
-                    <span>İlerleme</span>
-                    <span id="progressText">0/0</span>
-                </div>
-                <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-            </div>
-            
-            <div class="word-display">
-                <h3>Bu Tabu kelimesini biliyor musunuz?</h3>
-                <div id="currentWord" class="current-word">KELİME</div>
-                <div id="counter" class="counter">Kalan: 0</div>
-            </div>
-            
-            <!-- Büyük mobil butonları -->
-            <div class="action-buttons">
-                <button id="bigCorrectBtn" class="big-action-btn big-correct">
-                    <i class="fas fa-check-circle"></i>
-                    <span>BİLİYORUM</span>
-                </button>
-                <button id="bigIncorrectBtn" class="big-action-btn big-incorrect">
-                    <i class="fas fa-times-circle"></i>
-                    <span>TEKRAR ÇALIŞ</span>
-                </button>
-            </div>
-            
-            <!-- Normal butonlar (masaüstü için) -->
-            <div class="buttons">
-                <button id="correctBtn" class="btn btn-success">
-                    <i class="fas fa-check"></i> Biliyorum
-                </button>
-                <button id="incorrectBtn" class="btn btn-danger">
-                    <i class="fas fa-times"></i> Tekrar Çalış
-                </button>
-                <button id="pauseBtn" class="btn btn-neutral">
-                    <i class="fas fa-stop"></i> Durdur
-                </button>
-            </div>
-        </div>
-        
-        <!-- Phase 3: Kelime Eleme Sonuçları -->
-        <div id="phase3" class="phase">
-            <h2>Tabu Eleme Sonuçları</h2>
-            <p style="text-align: center; margin-bottom: 25px; color: #7f8c8d; font-size: 1.1rem;">
-                Toplam <span id="totalWordsCount" style="font-weight: bold; color: #2c3e50;">0</span> kelime üzerinden eleme tamamlandı.
-            </p>
-            
-            <div class="progress-container" style="margin: 0 auto 25px; max-width: 300px;">
-                <div class="progress-text">
-                    <span>Bilinen Oranı</span>
-                    <span id="correctPercentage">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div id="correctPercentageBar" class="progress-fill" style="background: linear-gradient(to right, #2ecc71, #27ae60);"></div>
-                </div>
-            </div>
-            
-            <div class="download-info">
-                <h4><i class="fas fa-download"></i> Sonuçları İndir</h4>
-                <p>Eleme sonuçlarınızı aşağıdaki butonlardan indirebilirsiniz. İndirilen dosyaları not defteri veya Excel'de açabilirsiniz.</p>
-            </div>
-            
-            <div class="download-buttons">
-                <button id="downloadAllBtn" class="btn btn-download">
-                    <i class="fas fa-file-download"></i> Tüm Sonuçları İndir
-                </button>
-                <button id="downloadWrongBtn" class="btn btn-danger">
-                    <i class="fas fa-file-excel"></i> Tekrar Çalışılacakları İndir
-                </button>
-            </div>
-            
-            <div class="results-container">
-                <div class="results-box correct-results">
-                    <h3 class="results-title">
-                        <i class="fas fa-check-circle"></i> Bildikleriniz
-                        <span id="correctCount">0</span>
-                    </h3>
-                    <ul id="correctList" class="results-list">
-                        <!-- Bilinen kelimeler buraya eklenecek -->
-                    </ul>
-                </div>
-                
-                <div class="results-box incorrect-results">
-                    <h3 class="results-title">
-                        <i class="fas fa-times-circle"></i> Tekrar Çalışılacaklar
-                        <span id="incorrectCount">0</span>
-                    </h3>
-                    <ul id="incorrectList" class="results-list">
-                        <!-- Tekrar çalışılacak kelimeler buraya eklenecek -->
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="buttons">
-                <button id="restartBtn" class="btn btn-primary">
-                    <i class="fas fa-redo"></i> Aynı Listeyle Yeniden Başla
-                </button>
-                <button id="practiceWrongBtn" class="btn btn-danger">
-                    <i class="fas fa-book"></i> Sadece Tekrar Çalışılacakları Ele
-                </button>
-                <button id="newListBtn" class="btn btn-neutral">
-                    <i class="fas fa-list"></i> Yeni Liste
-                </button>
-            </div>
-        </div>
-        
-        <!-- Phase 4: Benzersiz Kelime Sonuçları (Mod 2) -->
-        <div id="phase4" class="phase">
-            <h2>Benzersiz Kelime Sonuçları</h2>
-            
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="stat-value" id="originalCount">0</div>
-                    <div class="stat-label">Orijinal Kelime Sayısı</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="uniqueCount">0</div>
-                    <div class="stat-label">Benzersiz Kelime Sayısı</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="duplicateCount">0</div>
-                    <div class="stat-label">Çıkarılan Tekrar Sayısı</div>
-                </div>
-            </div>
-            
-            <div class="download-info">
-                <h4><i class="fas fa-download"></i> Sonuçları İndir</h4>
-                <p>Benzersiz kelime listesini aşağıdaki butonlardan indirebilirsiniz. İndirilen dosyaları not defteri veya Excel'de açabilirsiniz.</p>
-            </div>
-            
-            <div class="download-buttons">
-                <button id="downloadUniqueBtn" class="btn btn-download">
-                    <i class="fas fa-file-download"></i> Benzersiz Listeyi İndir
-                </button>
-                <button id="downloadDuplicatesBtn" class="btn btn-warning">
-                    <i class="fas fa-file-excel"></i> Tekrar Edenleri İndir
-                </button>
-            </div>
-            
-            <div class="results-container">
-                <div class="results-box unique-results">
-                    <h3 class="results-title">
-                        <i class="fas fa-search"></i> Benzersiz Kelimeler
-                        <span id="uniqueWordsCount">0</span>
-                    </h3>
-                    <ul id="uniqueList" class="results-list">
-                        <!-- Benzersiz kelimeler buraya eklenecek -->
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="buttons">
-                <button id="restartUniqueBtn" class="btn btn-primary">
-                    <i class="fas fa-redo"></i> Yeni Liste ile Başla
-                </button>
-                <button id="backToModeFromResultsBtn" class="btn btn-neutral">
-                    <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        Tabu Kelime Eleme Uygulaması &copy; 2023 | Sonuçlarınızı İndirin
+      </div>
+
+      <div class="buttons" style="margin-top:30px;">
+        <button id="continueBtn" class="btn btn-primary">
+          <i class="fas fa-arrow-right"></i> Seçilen Mod ile Devam Et
+        </button>
+      </div>
     </div>
 
-    <script>
-        // Uygulama durumunu saklamak için değişkenler
-        let allWords = [];
-        let currentWordIndex = 0;
-        let correctWords = [];
-        let incorrectWords = [];
-        let originalWords = [];
-        let currentMode = 1; // 1: Eleme modu, 2: Benzersiz kelime modu
-        let uniqueWords = [];
-        let duplicateWords = [];
-        let wordCountMap = new Map();
-        
-        // DOM elementlerini seçme
-        const phase0 = document.getElementById('phase0');
-        const phase1 = document.getElementById('phase1');
-        const phase2 = document.getElementById('phase2');
-        const phase3 = document.getElementById('phase3');
-        const phase4 = document.getElementById('phase4');
-        const wordInput = document.getElementById('wordInput');
-        const continueBtn = document.getElementById('continueBtn');
-        const mode1Btn = document.getElementById('mode1Btn');
-        const mode2Btn = document.getElementById('mode2Btn');
-        const startBtn = document.getElementById('startBtn');
-        const exampleBtn = document.getElementById('exampleBtn');
-        const backToModeBtn = document.getElementById('backToModeBtn');
-        const currentWordElement = document.getElementById('currentWord');
-        const correctBtn = document.getElementById('correctBtn');
-        const incorrectBtn = document.getElementById('incorrectBtn');
-        const bigCorrectBtn = document.getElementById('bigCorrectBtn');
-        const bigIncorrectBtn = document.getElementById('bigIncorrectBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const correctList = document.getElementById('correctList');
-        const incorrectList = document.getElementById('incorrectList');
-        const correctCount = document.getElementById('correctCount');
-        const incorrectCount = document.getElementById('incorrectCount');
-        const totalWordsCount = document.getElementById('totalWordsCount');
-        const restartBtn = document.getElementById('restartBtn');
-        const practiceWrongBtn = document.getElementById('practiceWrongBtn');
-        const newListBtn = document.getElementById('newListBtn');
-        const progressText = document.getElementById('progressText');
-        const progressFill = document.getElementById('progressFill');
-        const counter = document.getElementById('counter');
-        const correctPercentage = document.getElementById('correctPercentage');
-        const correctPercentageBar = document.getElementById('correctPercentageBar');
-        const downloadAllBtn = document.getElementById('downloadAllBtn');
-        const downloadWrongBtn = document.getElementById('downloadWrongBtn');
-        const downloadUniqueBtn = document.getElementById('downloadUniqueBtn');
-        const downloadDuplicatesBtn = document.getElementById('downloadDuplicatesBtn');
-        const uniqueList = document.getElementById('uniqueList');
-        const originalCount = document.getElementById('originalCount');
-        const uniqueCount = document.getElementById('uniqueCount');
-        const duplicateCount = document.getElementById('duplicateCount');
-        const uniqueWordsCount = document.getElementById('uniqueWordsCount');
-        const restartUniqueBtn = document.getElementById('restartUniqueBtn');
-        const backToModeFromResultsBtn = document.getElementById('backToModeFromResultsBtn');
-        
-        // Başlangıç ayarları
-        function initApp() {
-            // Event listener'ları ekle
-            continueBtn.addEventListener('click', continueToInput);
-            mode1Btn.addEventListener('click', () => selectMode(1));
-            mode2Btn.addEventListener('click', () => selectMode(2));
-            startBtn.addEventListener('click', startProcess);
-            exampleBtn.addEventListener('click', loadExampleWords);
-            backToModeBtn.addEventListener('click', backToModeSelect);
-            
-            // Cevap butonları (Mod 1)
-            correctBtn.addEventListener('click', () => handleAnswer(true));
-            incorrectBtn.addEventListener('click', () => handleAnswer(false));
-            bigCorrectBtn.addEventListener('click', () => handleAnswer(true));
-            bigIncorrectBtn.addEventListener('click', () => handleAnswer(false));
-            
-            // Diğer butonlar (Mod 1)
-            pauseBtn.addEventListener('click', pausePractice);
-            restartBtn.addEventListener('click', () => restartPractice(false));
-            practiceWrongBtn.addEventListener('click', () => restartPractice(true));
-            newListBtn.addEventListener('click', newList);
-            
-            // İndirme butonları
-            downloadAllBtn.addEventListener('click', downloadAllResults);
-            downloadWrongBtn.addEventListener('click', downloadWrongResults);
-            downloadUniqueBtn.addEventListener('click', downloadUniqueResults);
-            downloadDuplicatesBtn.addEventListener('click', downloadDuplicateResults);
-            
-            // Mod 2 butonları
-            restartUniqueBtn.addEventListener('click', newListForUnique);
-            backToModeFromResultsBtn.addEventListener('click', backToModeSelect);
-            
-            // Klavye kısayolları
-            document.addEventListener('keydown', handleKeyDown);
-            
-            // Dokunma olayları (swipe için)
-            setupTouchEvents();
-            
-            // Örnek kelimeleri yükle
-            loadExampleWords();
+    <!-- Phase 1: Kelime Girişi -->
+    <div id="phase1" class="phase">
+      <div class="instructions">
+        <h3><i class="fas fa-info-circle"></i> Nasıl Kullanılır?</h3>
+        <p>
+          Kelimelerinizi <b>virgül (,)</b> veya <b>yeni satır</b> ile ayırarak yazın.
+          İsterseniz <b>numaralı</b> da yazabilirsiniz (örn: <b>1. Donald Duck</b>) — sistem baştaki “1.” gibi numaraları otomatik siler.
+        </p>
+      </div>
+
+      <textarea id="wordInput" placeholder="Örnek: 1. Donald Duck, 2. Robin Hood, 3. Bugs Bunny"></textarea>
+
+      <div class="buttons">
+        <button id="startBtn" class="btn btn-primary">
+          <i class="fas fa-play"></i> Başla
+        </button>
+        <button id="exampleBtn" class="btn btn-neutral">
+          <i class="fas fa-magic"></i> Örnek Yükle
+        </button>
+        <button id="backToModeBtn" class="btn btn-neutral">
+          <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
+        </button>
+      </div>
+    </div>
+
+    <!-- Phase 2: Kelime Eleme (Mod 1) -->
+    <div id="phase2" class="phase">
+      <div class="progress-container">
+        <div class="progress-text">
+          <span>İlerleme</span>
+          <span id="progressText">0/0</span>
+        </div>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="word-display">
+        <h3>Bu Tabu kelimesini biliyor musunuz?</h3>
+        <div id="currentWord" class="current-word">KELİME</div>
+        <div id="counter" class="counter">Kalan: 0</div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="bigCorrectBtn" class="big-action-btn big-correct">
+          <i class="fas fa-check-circle"></i>
+          <span>BİLİYORUM</span>
+        </button>
+        <button id="bigIncorrectBtn" class="big-action-btn big-incorrect">
+          <i class="fas fa-times-circle"></i>
+          <span>TEKRAR ÇALIŞ</span>
+        </button>
+      </div>
+
+      <div class="buttons">
+        <button id="correctBtn" class="btn btn-success">
+          <i class="fas fa-check"></i> Biliyorum
+        </button>
+        <button id="incorrectBtn" class="btn btn-danger">
+          <i class="fas fa-times"></i> Tekrar Çalış
+        </button>
+        <button id="pauseBtn" class="btn btn-neutral">
+          <i class="fas fa-stop"></i> Durdur
+        </button>
+      </div>
+    </div>
+
+    <!-- Phase 3: Kelime Eleme Sonuçları -->
+    <div id="phase3" class="phase">
+      <h2>Tabu Eleme Sonuçları</h2>
+      <p style="text-align:center; margin-bottom:25px; color:#7f8c8d; font-size:1.1rem;">
+        Toplam <span id="totalWordsCount" style="font-weight:bold; color:#2c3e50;">0</span> kelime üzerinden eleme tamamlandı.
+      </p>
+
+      <div class="progress-container" style="margin:0 auto 25px; max-width:300px;">
+        <div class="progress-text">
+          <span>Bilinen Oranı</span>
+          <span id="correctPercentage">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div id="correctPercentageBar" class="progress-fill" style="background: linear-gradient(to right, #2ecc71, #27ae60);"></div>
+        </div>
+      </div>
+
+      <div class="download-info">
+        <h4><i class="fas fa-copy"></i> Kopyala</h4>
+        <p>
+          İndirmek yerine, aşağıdaki butonlarla çıktıyı <b>direkt panoya</b> kopyalayabilirsiniz.
+          İsterseniz yine “İndir” butonlarını kullanarak dosya da alabilirsiniz.
+        </p>
+
+        <div class="copy-buttons">
+          <button id="copyKnownCommaBtn" class="btn btn-copy">
+            <i class="fas fa-clipboard"></i> Bildiklerimi (Virgüllü) Kopyala
+          </button>
+          <button id="copyWrongCommaBtn" class="btn btn-copy">
+            <i class="fas fa-clipboard"></i> Tekrar Çalış (Virgüllü) Kopyala
+          </button>
+          <button id="copyKnownNumberedBtn" class="btn btn-copy">
+            <i class="fas fa-list-ol"></i> Bildiklerimi (Numaralı) Kopyala
+          </button>
+          <button id="copyWrongNumberedBtn" class="btn btn-copy">
+            <i class="fas fa-list-ol"></i> Tekrar Çalış (Numaralı) Kopyala
+          </button>
+        </div>
+      </div>
+
+      <div class="download-buttons">
+        <button id="downloadAllBtn" class="btn btn-download">
+          <i class="fas fa-file-download"></i> Tüm Sonuçları İndir
+        </button>
+        <button id="downloadWrongBtn" class="btn btn-danger">
+          <i class="fas fa-file-excel"></i> Tekrar Çalışılacakları İndir
+        </button>
+      </div>
+
+      <div class="results-container">
+        <div class="results-box correct-results">
+          <h3 class="results-title">
+            <i class="fas fa-check-circle"></i> Bildikleriniz
+            <span id="correctCount">0</span>
+          </h3>
+          <ul id="correctList" class="results-list"></ul>
+        </div>
+
+        <div class="results-box incorrect-results">
+          <h3 class="results-title">
+            <i class="fas fa-times-circle"></i> Tekrar Çalışılacaklar
+            <span id="incorrectCount">0</span>
+          </h3>
+          <ul id="incorrectList" class="results-list"></ul>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="restartBtn" class="btn btn-primary">
+          <i class="fas fa-redo"></i> Aynı Listeyle Yeniden Başla
+        </button>
+        <button id="practiceWrongBtn" class="btn btn-danger">
+          <i class="fas fa-book"></i> Sadece Tekrar Çalışılacakları Ele
+        </button>
+        <button id="newListBtn" class="btn btn-neutral">
+          <i class="fas fa-list"></i> Yeni Liste
+        </button>
+        <button id="backToModeFromElemeBtn" class="btn btn-neutral">
+          <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
+        </button>
+      </div>
+    </div>
+
+    <!-- Phase 4: Benzersiz Kelime Sonuçları (Mod 2) -->
+    <div id="phase4" class="phase">
+      <h2>Benzersiz Kelime Sonuçları</h2>
+
+      <div class="stats-container">
+        <div class="stat-box">
+          <div class="stat-value" id="originalCount">0</div>
+          <div class="stat-label">Orijinal Kelime Sayısı</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="uniqueCount">0</div>
+          <div class="stat-label">Benzersiz Kelime Sayısı</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="duplicateCount">0</div>
+          <div class="stat-label">Çıkarılan Tekrar Sayısı</div>
+        </div>
+      </div>
+
+      <div class="download-info">
+        <h4><i class="fas fa-download"></i> Sonuçları İndir</h4>
+        <p>Benzersiz ve tekrar eden listeler indirilebilir. Çıktıda hem numaralı liste hem virgüllü tek satır bulunur.</p>
+      </div>
+
+      <div class="download-buttons">
+        <button id="downloadUniqueBtn" class="btn btn-download">
+          <i class="fas fa-file-download"></i> Benzersiz Listeyi İndir
+        </button>
+        <button id="downloadDuplicatesBtn" class="btn btn-warning">
+          <i class="fas fa-file-excel"></i> Tekrar Edenleri İndir
+        </button>
+      </div>
+
+      <div class="results-container">
+        <div class="results-box unique-results">
+          <h3 class="results-title">
+            <i class="fas fa-search"></i> Benzersiz Kelimeler
+            <span id="uniqueWordsCount">0</span>
+          </h3>
+          <ul id="uniqueList" class="results-list"></ul>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="restartUniqueBtn" class="btn btn-primary">
+          <i class="fas fa-redo"></i> Yeni Liste ile Başla
+        </button>
+        <button id="backToModeFromResultsBtn" class="btn btn-neutral">
+          <i class="fas fa-arrow-left"></i> Mod Seçimine Dön
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Tabu Kelime Eleme Uygulaması &copy; 2023 | Sonuçlarınızı İndirin
+  </div>
+
+  <script>
+    // ===========================
+    //  DURUM (STATE)
+    // ===========================
+    let allWords = [];
+    let originalWords = [];
+    let currentWordIndex = 0;
+
+    let correctWords = [];
+    let incorrectWords = [];
+
+    let currentMode = 1; // 1: Eleme, 2: Aynıları Bul
+
+    // Mod 2 (benzersiz)
+    let uniqueWords = [];
+    let duplicateWords = [];       // "KELİME (X kez)" formatı
+    let duplicateBaseWords = [];   // sadece kelimenin kendisi
+    let wordCountMap = new Map();  // key -> { count, display }
+
+    // ===========================
+    //  DOM
+    // ===========================
+    const phases = {
+      0: document.getElementById('phase0'),
+      1: document.getElementById('phase1'),
+      2: document.getElementById('phase2'),
+      3: document.getElementById('phase3'),
+      4: document.getElementById('phase4'),
+    };
+
+    const wordInput = document.getElementById('wordInput');
+
+    const continueBtn = document.getElementById('continueBtn');
+    const mode1Btn = document.getElementById('mode1Btn');
+    const mode2Btn = document.getElementById('mode2Btn');
+
+    const startBtn = document.getElementById('startBtn');
+    const exampleBtn = document.getElementById('exampleBtn');
+    const backToModeBtn = document.getElementById('backToModeBtn');
+
+    const currentWordElement = document.getElementById('currentWord');
+    const correctBtn = document.getElementById('correctBtn');
+    const incorrectBtn = document.getElementById('incorrectBtn');
+    const bigCorrectBtn = document.getElementById('bigCorrectBtn');
+    const bigIncorrectBtn = document.getElementById('bigIncorrectBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    const correctList = document.getElementById('correctList');
+    const incorrectList = document.getElementById('incorrectList');
+    const correctCount = document.getElementById('correctCount');
+    const incorrectCount = document.getElementById('incorrectCount');
+    const totalWordsCount = document.getElementById('totalWordsCount');
+
+    const restartBtn = document.getElementById('restartBtn');
+    const practiceWrongBtn = document.getElementById('practiceWrongBtn');
+    const newListBtn = document.getElementById('newListBtn');
+    const backToModeFromElemeBtn = document.getElementById('backToModeFromElemeBtn');
+
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+    const counter = document.getElementById('counter');
+
+    const correctPercentage = document.getElementById('correctPercentage');
+    const correctPercentageBar = document.getElementById('correctPercentageBar');
+
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const downloadWrongBtn = document.getElementById('downloadWrongBtn');
+    const downloadUniqueBtn = document.getElementById('downloadUniqueBtn');
+    const downloadDuplicatesBtn = document.getElementById('downloadDuplicatesBtn');
+
+    const uniqueList = document.getElementById('uniqueList');
+    const originalCount = document.getElementById('originalCount');
+    const uniqueCount = document.getElementById('uniqueCount');
+    const duplicateCount = document.getElementById('duplicateCount');
+    const uniqueWordsCount = document.getElementById('uniqueWordsCount');
+
+    const restartUniqueBtn = document.getElementById('restartUniqueBtn');
+    const backToModeFromResultsBtn = document.getElementById('backToModeFromResultsBtn');
+
+    // Kopyalama butonları (Mod 1 sonuç ekranı)
+    const copyKnownCommaBtn = document.getElementById('copyKnownCommaBtn');
+    const copyWrongCommaBtn = document.getElementById('copyWrongCommaBtn');
+    const copyKnownNumberedBtn = document.getElementById('copyKnownNumberedBtn');
+    const copyWrongNumberedBtn = document.getElementById('copyWrongNumberedBtn');
+
+    // ===========================
+    //  YARDIMCILAR
+    // ===========================
+
+    // "1. Donald Duck" / "2) Robin Hood" / "- 3. ..." / "• 4) ..." gibi baştaki numara/bullet kalıplarını sil
+    function stripLeadingIndex(s) {
+      let out = String(s ?? '');
+
+      // NBSP -> space
+      out = out.replace(/\u00A0/g, ' ');
+
+      // trim + collapse spaces
+      out = out.trim().replace(/\s+/g, ' ');
+
+      // Leading bullets like "-", "*", "•"
+      out = out.replace(/^(?:[-*•]\s*)+/, '').trim();
+
+      // Leading numbered patterns:
+      //  "1. ", "1) ", "1 - ", "1: ", "01. ", "12) "
+      out = out.replace(/^\s*\d+\s*([.)\-:])\s*/g, '').trim();
+
+      // Also handle "1 ." (space before dot)
+      out = out.replace(/^\s*\d+\s*\.\s*/g, '').trim();
+
+      // Final collapse
+      out = out.trim().replace(/\s+/g, ' ');
+
+      return out;
+    }
+
+    // Kullanıcının yazdığı kelimeyi görsel/çıktı için temizle (numarayı da siler)
+    function normalizeForDisplay(raw) {
+      return stripLeadingIndex(raw);
+    }
+
+    // Aynı kelimeyi karşılaştırmak için (Mod 2): Türkçe locale + boşluk normalize + TAM eşleşme
+    // Not: "seher" ile "seher yıldız" farklıdır; substring kontrol yoktur.
+    function normalizeForKey(raw) {
+      const d = normalizeForDisplay(raw);
+      return d.toLocaleLowerCase('tr-TR');
+    }
+
+    // Input'u virgül/yeni satır ile parçala, boşları at (girdi sırası korunur)
+    function parseInputWords(inputText) {
+      const raw = String(inputText ?? '').trim();
+      if (!raw) return [];
+
+      return raw
+        .split(/[,\n]/)
+        .map(w => normalizeForDisplay(w))
+        .filter(w => w !== '');
+    }
+
+    // Faz yönetimi
+    function setActivePhase(phaseNo) {
+      Object.values(phases).forEach(p => p.classList.remove('active'));
+      phases[phaseNo].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dateStampTR() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
+      const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
+      return { now, dateStr, timeStr };
+    }
+
+    function buildNumberedList(lines) {
+      if (!lines || lines.length === 0) return '(boş)\n';
+      return lines.map((w, i) => `${i + 1}. ${w}`).join('\n') + '\n';
+    }
+
+    function buildCommaLine(lines) {
+      if (!lines || lines.length === 0) return '(boş)';
+      return lines.join(', ');
+    }
+
+    function buildDownloadContent({ headerTitle, metaLines = [], sections = [] }) {
+      let content = `${headerTitle}\n`;
+      content += `${'='.repeat(Math.min(60, headerTitle.length))}\n`;
+
+      const stamp = dateStampTR();
+      content += `Tarih: ${stamp.dateStr} ${stamp.timeStr}\n`;
+      metaLines.forEach(l => content += `${l}\n`);
+      content += '\n';
+
+      sections.forEach(sec => {
+        content += `=== ${sec.title} ===\n\n`;
+        content += `Numaralı Liste:\n`;
+        content += buildNumberedList(sec.list);
+        content += `\nVirgüllü Tek Satır:\n`;
+        content += buildCommaLine(sec.list) + '\n\n';
+      });
+
+      return content;
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 100);
+      showToast('İndirme Başladı', 'Dosya cihazınıza indiriliyor...', 'success');
+    }
+
+    // Panoya kopyalama (modern + fallback)
+    async function copyToClipboard(text) {
+      const content = String(text ?? '');
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(content);
+          return true;
         }
-        
-        // Mod seçimi
-        function selectMode(mode) {
-            currentMode = mode;
-            
-            // Tüm mod butonlarının aktif sınıfını kaldır
-            mode1Btn.classList.remove('active');
-            mode2Btn.classList.remove('active');
-            
-            // Seçilen mod butonunu aktif yap
-            if (mode === 1) {
-                mode1Btn.classList.add('active');
-            } else {
-                mode2Btn.classList.add('active');
-            }
+      } catch (_) {}
+
+      // fallback
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = content;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        ta.style.left = '-1000px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // Toast / bildirim
+    function showToast(title, message, type = 'success') {
+      const existing = document.querySelector('.toast-notification');
+      if (existing) existing.remove();
+
+      const bg = type === 'success'
+        ? 'linear-gradient(to right, #2ecc71, #27ae60)'
+        : (type === 'info'
+          ? 'linear-gradient(to right, #3498db, #2980b9)'
+          : 'linear-gradient(to right, #e74c3c, #c0392b)');
+
+      const notification = document.createElement('div');
+      notification.className = 'toast-notification';
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bg};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+        max-width: 340px;
+      `;
+      notification.innerHTML = `
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'info' ? 'fa-info-circle' : 'fa-times-circle')}" style="font-size:1.2rem; margin-top:2px;"></i>
+          <div>
+            <strong>${title}</strong>
+            <div style="font-size:0.9rem; margin-top:5px; line-height:1.35;">${message}</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        if (!notification.parentNode) return;
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 2500);
+
+      if (!document.querySelector('#toastAnimations')) {
+        const style = document.createElement('style');
+        style.id = 'toastAnimations';
+        style.textContent = `
+          @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+          @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+
+    // ===========================
+    //  UYGULAMA AKIŞI
+    // ===========================
+    function selectMode(mode) {
+      currentMode = mode;
+      mode1Btn.classList.toggle('active', mode === 1);
+      mode2Btn.classList.toggle('active', mode === 2);
+    }
+
+    function continueToInput() {
+      setActivePhase(1);
+      wordInput.placeholder = currentMode === 1
+        ? "Örnek: 1. Donald Duck, 2. Robin Hood, 3. Bugs Bunny"
+        : "Örnek: seher, Seher, seher yıldız, Seher Yıldız, TABUT, tabut, KARANLIK ODA, karanlık oda";
+      wordInput.focus();
+    }
+
+    function backToModeSelect() {
+      setActivePhase(0);
+    }
+
+    function loadExampleWords() {
+      const exampleWords = currentMode === 1
+        ? ["1. Donald Duck","2. Robin Hood","3. Bugs Bunny","4. Tom ve Jerry","5. Tweety","6. Alaaddin'in Lambası"]
+        : ["seher","Seher","seher yıldız","Seher Yıldız","TABUT","tabut","KARANLIK ODA","karanlık oda","GÖZLÜK","gözlük"];
+      wordInput.value = exampleWords.join('\n');
+      wordInput.focus();
+    }
+
+    function startProcess() {
+      const parsed = parseInputWords(wordInput.value);
+
+      if (parsed.length === 0) {
+        alert('Lütfen en az bir Tabu kelimesi girin!');
+        wordInput.focus();
+        return;
+      }
+
+      // Eleme modunda: sıra korunmalı
+      allWords = parsed;
+      originalWords = [...allWords];
+
+      if (currentMode === 1) startElemeMode();
+      else startUniqueMode();
+    }
+
+    // ===========================
+    //  MOD 1: ELEME (SIRA KORUNUR)
+    // ===========================
+    function startElemeMode() {
+      // ÖNEMLİ: Karıştırma YOK — kullanıcı hangi sırada girdiyse o sırada gider.
+      currentWordIndex = 0;
+      correctWords = [];
+      incorrectWords = [];
+      setActivePhase(2);
+      showCurrentWord();
+    }
+
+    function updateProgress() {
+      const total = allWords.length || 1;
+      const progress = ((currentWordIndex + 1) / total) * 100;
+      progressFill.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+      progressText.textContent = `${Math.min(currentWordIndex + 1, allWords.length)}/${allWords.length}`;
+    }
+
+    function showCurrentWord() {
+      if (currentWordIndex < allWords.length) {
+        // Buraya gelen kelime zaten "1." gibi numaralardan arındırılmış olur.
+        currentWordElement.textContent = allWords[currentWordIndex];
+        currentWordElement.classList.add('word-animation');
+
+        updateProgress();
+
+        const remaining = allWords.length - currentWordIndex - 1;
+        counter.textContent = `Kalan: ${remaining}`;
+
+        setTimeout(() => currentWordElement.classList.remove('word-animation'), 350);
+      } else {
+        finishPractice();
+      }
+    }
+
+    function handleAnswer(isCorrect) {
+      if (currentWordIndex >= allWords.length) return;
+
+      const currentWord = allWords[currentWordIndex];
+
+      if (isCorrect) {
+        correctWords.push(currentWord);
+        bigCorrectBtn.style.transform = 'scale(0.97)';
+        setTimeout(() => bigCorrectBtn.style.transform = '', 120);
+      } else {
+        incorrectWords.push(currentWord);
+        bigIncorrectBtn.style.transform = 'scale(0.97)';
+        setTimeout(() => bigIncorrectBtn.style.transform = '', 120);
+      }
+
+      currentWordIndex++;
+      setTimeout(showCurrentWord, 120);
+    }
+
+    function pausePractice() {
+      if (allWords.length > 0 && currentWordIndex < allWords.length) {
+        if (confirm('Elemeyi durdurup sonuçları görmek istiyor musunuz?')) {
+          finishPractice();
         }
-        
-        // Mod seçiminden devam et
-        function continueToInput() {
-            // Faz değiştir
-            switchPhase(0, 1);
-            
-            // Moda göre placeholder güncelle
-            if (currentMode === 1) {
-                wordInput.placeholder = "Örnek: elma, armut, muz, çilek, elma, armut, portakal, muz...";
-            } else {
-                wordInput.placeholder = "Örnek: ahtapot, balık, yengeç, ahtapot, istakoz, balık, ahtapot...";
-            }
-            
-            wordInput.focus();
+      } else {
+        finishPractice();
+      }
+    }
+
+    function finishPractice() {
+      // Kalan kelimeleri otomatik "Tekrar Çalış" say
+      if (currentWordIndex < allWords.length) {
+        for (let i = currentWordIndex; i < allWords.length; i++) {
+          incorrectWords.push(allWords[i]);
         }
-        
-        // Mod seçimine dön
-        function backToModeSelect() {
-            // Faz değiştir
-            if (phase1.classList.contains('active')) {
-                switchPhase(1, 0);
-            } else if (phase3.classList.contains('active')) {
-                switchPhase(3, 0);
-            } else if (phase4.classList.contains('active')) {
-                switchPhase(4, 0);
-            }
+      }
+
+      setActivePhase(3);
+      displayResults();
+    }
+
+    function displayResults() {
+      const total = allWords.length;
+      totalWordsCount.textContent = total;
+
+      const correct = correctWords.length;
+      const incorrect = incorrectWords.length;
+
+      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+      correctPercentage.textContent = `${percentage}%`;
+      correctPercentageBar.style.width = `${percentage}%`;
+
+      correctList.innerHTML = '';
+      correctWords.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        correctList.appendChild(li);
+      });
+      correctCount.textContent = correct;
+
+      incorrectList.innerHTML = '';
+      incorrectWords.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        incorrectList.appendChild(li);
+      });
+      incorrectCount.textContent = incorrect;
+
+      const existingMessage = phases[3].querySelector('.result-message');
+      if (existingMessage) existingMessage.remove();
+
+      let message = '';
+      if (incorrect === 0 && total > 0) message = '<i class="fas fa-trophy"></i> Mükemmel! Tüm kelimeleri biliyorsunuz!';
+      else if (percentage >= 80) message = '<i class="fas fa-star"></i> Çok iyi! Harika bir sonuç!';
+      else if (percentage >= 60) message = '<i class="fas fa-thumbs-up"></i> İyi gidiyorsunuz, biraz daha çalışın!';
+      else message = '<i class="fas fa-redo"></i> Daha çok pratik yapmanız gerekiyor. Tekrar deneyin!';
+
+      const messageElem = document.createElement('p');
+      messageElem.className = 'result-message';
+      messageElem.style.background = 'linear-gradient(135deg, #ff6b6b, #4ecdc4)';
+      messageElem.innerHTML = message;
+
+      const buttonsContainer = phases[3].querySelector('.buttons');
+      phases[3].insertBefore(messageElem, buttonsContainer);
+    }
+
+    function restartPractice(onlyWrong = false) {
+      let wordsToPractice = [];
+
+      if (onlyWrong) {
+        if (incorrectWords.length === 0) {
+          alert('Tekrar çalışılacak kelime bulunamadı!');
+          return;
         }
-        
-        // Örnek Tabu kelimelerini yükle
-        function loadExampleWords() {
-            let exampleWords = [];
-            
-            if (currentMode === 1) {
-                // Eleme modu için örnek
-                exampleWords = [
-                    "elma", "armut", "muz", "çilek", "portakal", "karpuz", "kavun",
-                    "üzüm", "şeftali", "kayısı", "erik", "vişne", "kiraz", "nar",
-                    "incir", "ayva", "limon", "greyfurt", "mandalina", "ananas"
-                ];
-            } else {
-                // Benzersiz kelime modu için örnek (tekrar eden kelimeler içeren)
-                exampleWords = [
-                    "ahtapot", "balık", "yengeç", "ahtapot", "istakoz", "balık", 
-                    "ahtapot", "karides", "midye", "yengeç", "balina", "köpekbalığı",
-                    "midye", "ahtapot", "yunus", "balık", "istakoz", "karides"
-                ];
-            }
-            
-            wordInput.value = exampleWords.join(', ');
-            wordInput.focus();
+        // Kalanların sırasını korur
+        wordsToPractice = [...incorrectWords];
+      } else {
+        // Orijinal giriş sırası korunur
+        wordsToPractice = [...originalWords];
+      }
+
+      allWords = wordsToPractice;
+      currentWordIndex = 0;
+      correctWords = [];
+      incorrectWords = [];
+
+      setActivePhase(2);
+      showCurrentWord();
+    }
+
+    function newList() {
+      wordInput.value = '';
+      setActivePhase(1);
+      wordInput.focus();
+    }
+
+    // ===========================
+    //  MOD 2: AYNILARI BUL (BENZERSİZ)
+    // ===========================
+    function startUniqueMode() {
+      wordCountMap.clear();
+      duplicateWords = [];
+      duplicateBaseWords = [];
+      uniqueWords = [];
+
+      // Key -> { count, display }
+      // Büyük/küçük fark etmez, ama TAM eşleşme yapar:
+      // "seher" != "seher yıldız"
+      allWords.forEach(word => {
+        const key = normalizeForKey(word);
+        const existing = wordCountMap.get(key);
+        if (!existing) {
+          wordCountMap.set(key, { count: 1, display: word });
+        } else {
+          existing.count += 1;
+          wordCountMap.set(key, existing);
         }
-        
-        // İşlemi başlat (moda göre)
-        function startProcess() {
-            // Kelimeleri al ve temizle
-            const input = wordInput.value.trim();
-            if (!input) {
-                alert('Lütfen en az bir Tabu kelimesi girin!');
-                wordInput.focus();
-                return;
-            }
-            
-            // Kelimeleri ayır (virgül ve yeni satır ile)
-            allWords = input.split(/[,\n]/)
-                .map(word => word.trim())
-                .filter(word => word !== '');
-            
-            if (allWords.length === 0) {
-                alert('Lütfen geçerli Tabu kelimeleri girin!');
-                return;
-            }
-            
-            // Orijinal listeyi sakla (yeniden başlatma için)
-            originalWords = [...allWords];
-            
-            if (currentMode === 1) {
-                // Eleme modu
-                startElemeMode();
-            } else {
-                // Benzersiz kelime modu
-                startUniqueMode();
-            }
+      });
+
+      wordCountMap.forEach((obj) => {
+        uniqueWords.push(obj.display);
+        if (obj.count > 1) {
+          duplicateWords.push(`${obj.display} (${obj.count} kez)`);
+          duplicateBaseWords.push(obj.display);
         }
-        
-        // Eleme modunu başlat
-        function startElemeMode() {
-            // Kelimeleri karıştır
-            allWords = shuffleArray(allWords);
-            
-            // Sıfırla
-            currentWordIndex = 0;
-            correctWords = [];
-            incorrectWords = [];
-            
-            // Faz değiştir
-            switchPhase(1, 2);
-            
-            // İlk kelimeyi göster
-            showCurrentWord();
+      });
+
+      // Türkçe sıralama (benzersizler alfabetik)
+      uniqueWords.sort((a, b) => a.localeCompare(b, 'tr'));
+      duplicateBaseWords.sort((a, b) => a.localeCompare(b, 'tr'));
+      duplicateWords.sort((a, b) => a.localeCompare(b, 'tr'));
+
+      setActivePhase(4);
+      displayUniqueResults();
+    }
+
+    function displayUniqueResults() {
+      const original = allWords.length;
+      const unique = uniqueWords.length;
+      const removed = original - unique;
+
+      originalCount.textContent = original;
+      uniqueCount.textContent = unique;
+      duplicateCount.textContent = removed;
+      uniqueWordsCount.textContent = unique;
+
+      uniqueList.innerHTML = '';
+      uniqueWords.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        uniqueList.appendChild(li);
+      });
+
+      const existingMessage = phases[4].querySelector('.result-message');
+      if (existingMessage) existingMessage.remove();
+
+      const msg = removed === 0
+        ? '<i class="fas fa-check-circle"></i> Listenizde hiç tekrar eden kelime yok!'
+        : `<i class="fas fa-filter"></i> ${removed} adet tekrar eden kelime çıkarıldı.`;
+
+      const messageElem = document.createElement('p');
+      messageElem.className = 'result-message';
+      messageElem.style.background = 'linear-gradient(135deg, #3498db, #2980b9)';
+      messageElem.innerHTML = msg;
+
+      const buttonsContainer = phases[4].querySelector('.buttons');
+      phases[4].insertBefore(messageElem, buttonsContainer);
+    }
+
+    function newListForUnique() {
+      wordInput.value = '';
+      setActivePhase(1);
+      wordInput.focus();
+    }
+
+    // ===========================
+    //  KOPYALAMA (MOD 1 SONUÇ)
+    // ===========================
+    async function copyKnownComma() {
+      const text = buildCommaLine(correctWords);
+      const ok = await copyToClipboard(text);
+      showToast(ok ? 'Kopyalandı' : 'Kopyalama Başarısız', ok ? 'Bildikleriniz virgüllü olarak panoya kopyalandı.' : 'Tarayıcı izin vermedi. HTTPS veya farklı tarayıcı deneyin.', ok ? 'success' : 'error');
+    }
+    async function copyWrongComma() {
+      const text = buildCommaLine(incorrectWords);
+      const ok = await copyToClipboard(text);
+      showToast(ok ? 'Kopyalandı' : 'Kopyalama Başarısız', ok ? 'Tekrar çalış listesi virgüllü olarak panoya kopyalandı.' : 'Tarayıcı izin vermedi. HTTPS veya farklı tarayıcı deneyin.', ok ? 'success' : 'error');
+    }
+    async function copyKnownNumbered() {
+      const text = buildNumberedList(correctWords).trimEnd();
+      const ok = await copyToClipboard(text);
+      showToast(ok ? 'Kopyalandı' : 'Kopyalama Başarısız', ok ? 'Bildikleriniz numaralı olarak panoya kopyalandı.' : 'Tarayıcı izin vermedi. HTTPS veya farklı tarayıcı deneyin.', ok ? 'success' : 'error');
+    }
+    async function copyWrongNumbered() {
+      const text = buildNumberedList(incorrectWords).trimEnd();
+      const ok = await copyToClipboard(text);
+      showToast(ok ? 'Kopyalandı' : 'Kopyalama Başarısız', ok ? 'Tekrar çalış listesi numaralı olarak panoya kopyalandı.' : 'Tarayıcı izin vermedi. HTTPS veya farklı tarayıcı deneyin.', ok ? 'success' : 'error');
+    }
+
+    // ===========================
+    //  İNDİRME BUTONLARI
+    // ===========================
+    function downloadAllResults() {
+      if (correctWords.length === 0 && incorrectWords.length === 0) {
+        alert('İndirilecek sonuç bulunamadı!');
+        return;
+      }
+
+      const total = allWords.length;
+      const pct = total > 0 ? Math.round((correctWords.length / total) * 100) : 0;
+
+      const content = buildDownloadContent({
+        headerTitle: 'Tabu Kelime Eleme Sonuçları (Tüm Liste)',
+        metaLines: [
+          `Toplam Kelime: ${total}`,
+          `Bilinenler: ${correctWords.length}`,
+          `Tekrar Çalışılacaklar: ${incorrectWords.length}`,
+          `Başarı Oranı: ${pct}%`
+        ],
+        sections: [
+          { title: 'BİLİNEN KELİMELER', list: correctWords },
+          { title: 'TEKRAR ÇALIŞILACAK KELİMELER', list: incorrectWords }
+        ]
+      });
+
+      const stamp = dateStampTR();
+      const fileName = `tabu-sonuclari-tum-${stamp.dateStr}-${stamp.timeStr}.txt`;
+      downloadFile(content, fileName, 'text/plain');
+    }
+
+    function downloadWrongResults() {
+      if (incorrectWords.length === 0) {
+        alert('Tekrar çalışılacak kelime bulunamadı!');
+        return;
+      }
+
+      const content = buildDownloadContent({
+        headerTitle: 'Tabu Kelime Eleme (Tekrar Çalışılacaklar)',
+        metaLines: [
+          `Toplam: ${incorrectWords.length} kelime`
+        ],
+        sections: [
+          { title: 'TEKRAR ÇALIŞILACAK KELİMELER', list: incorrectWords }
+        ]
+      });
+
+      const stamp = dateStampTR();
+      const fileName = `tabu-tekrar-calisilacaklar-${stamp.dateStr}-${stamp.timeStr}.txt`;
+      downloadFile(content, fileName, 'text/plain');
+    }
+
+    function downloadUniqueResults() {
+      if (uniqueWords.length === 0) {
+        alert('Benzersiz kelime bulunamadı!');
+        return;
+      }
+
+      const removed = allWords.length - uniqueWords.length;
+
+      const content = buildDownloadContent({
+        headerTitle: 'Tabu Benzersiz Kelime Listesi',
+        metaLines: [
+          `Orijinal Kelime Sayısı: ${allWords.length}`,
+          `Benzersiz Kelime Sayısı: ${uniqueWords.length}`,
+          `Çıkarılan Tekrar Sayısı: ${removed}`
+        ],
+        sections: [
+          { title: 'BENZERSİZ KELİMELER', list: uniqueWords }
+        ]
+      });
+
+      const stamp = dateStampTR();
+      const fileName = `tabu-benzersiz-kelimeler-${stamp.dateStr}-${stamp.timeStr}.txt`;
+      downloadFile(content, fileName, 'text/plain');
+    }
+
+    function downloadDuplicateResults() {
+      if (duplicateWords.length === 0) {
+        alert('Tekrar eden kelime bulunamadı!');
+        return;
+      }
+
+      const content = buildDownloadContent({
+        headerTitle: 'Tabu Tekrar Eden Kelimeler',
+        metaLines: [
+          `Tekrar Eden Kelime Türü: ${duplicateWords.length}`,
+          `Not: Liste “kelime (kaç kez)” formatındadır.`
+        ],
+        sections: [
+          { title: 'TEKRAR EDENLER (SAYILI)', list: duplicateWords },
+          { title: 'TEKRAR EDENLER (SADECE KELİME)', list: duplicateBaseWords }
+        ]
+      });
+
+      const stamp = dateStampTR();
+      const fileName = `tabu-tekrar-edenler-${stamp.dateStr}-${stamp.timeStr}.txt`;
+      downloadFile(content, fileName, 'text/plain');
+    }
+
+    // ===========================
+    //  KLAVYE + SWIPE (MOD 1)
+    // ===========================
+    function handleKeyDown(e) {
+      if (!phases[2].classList.contains('active')) return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+        case '1':
+          handleAnswer(true);
+          e.preventDefault();
+          break;
+        case 'ArrowLeft':
+        case 'y':
+        case 'Y':
+        case '2':
+          handleAnswer(false);
+          e.preventDefault();
+          break;
+        case ' ':
+        case 'Enter':
+          pausePractice();
+          e.preventDefault();
+          break;
+        case 'Escape':
+          if (confirm('Elemeyi durdurmak istiyor musunuz?')) finishPractice();
+          e.preventDefault();
+          break;
+      }
+    }
+
+    function setupTouchEvents() {
+      let startX = 0, startY = 0;
+
+      document.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        if (!phases[2].classList.contains('active')) return;
+        if (!e.changedTouches || !e.changedTouches[0]) return;
+
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+
+        const diffX = endX - startX;
+        const diffY = endY - startY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+          if (diffX > 0) handleAnswer(true);
+          else handleAnswer(false);
         }
-        
-        // Benzersiz kelime modunu başlat
-        function startUniqueMode() {
-            // Kelime sayılarını hesapla
-            wordCountMap.clear();
-            duplicateWords = [];
-            uniqueWords = [];
-            
-            // Her kelimenin kaç kez tekrar ettiğini say
-            allWords.forEach(word => {
-                const lowerWord = word.toLowerCase();
-                const count = wordCountMap.get(lowerWord) || 0;
-                wordCountMap.set(lowerWord, count + 1);
-            });
-            
-            // Benzersiz ve tekrar eden kelimeleri ayır
-            wordCountMap.forEach((count, word) => {
-                const formattedWord = word.charAt(0).toUpperCase() + word.slice(1);
-                
-                if (count === 1) {
-                    uniqueWords.push(formattedWord);
-                } else {
-                    duplicateWords.push(`${formattedWord} (${count} kez)`);
-                    
-                    // Benzersiz listeye de ekle (sadece 1 kez)
-                    uniqueWords.push(formattedWord);
-                }
-            });
-            
-            // Benzersiz kelimeleri alfabetik sırala
-            uniqueWords.sort((a, b) => a.localeCompare(b, 'tr'));
-            
-            // Faz değiştir
-            switchPhase(1, 4);
-            
-            // Sonuçları göster
-            displayUniqueResults();
-        }
-        
-        // Faz değiştirme (animasyonlu)
-        function switchPhase(fromPhase, toPhase) {
-            const fromElem = document.getElementById(`phase${fromPhase}`);
-            const toElem = document.getElementById(`phase${toPhase}`);
-            
-            fromElem.classList.remove('active');
-            setTimeout(() => {
-                toElem.classList.add('active');
-            }, 50);
-        }
-        
-        // Kelimeleri karıştır
-        function shuffleArray(array) {
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-        
-        // Mevcut kelimeyi göster (Mod 1)
-        function showCurrentWord() {
-            if (currentWordIndex < allWords.length) {
-                currentWordElement.textContent = allWords[currentWordIndex];
-                currentWordElement.classList.add('word-animation');
-                
-                // İlerlemeyi güncelle
-                updateProgress();
-                
-                // Kalan kelime sayısını güncelle
-                const remaining = allWords.length - currentWordIndex - 1;
-                counter.textContent = `Kalan: ${remaining}`;
-                
-                // Animasyonu temizle
-                setTimeout(() => {
-                    currentWordElement.classList.remove('word-animation');
-                }, 400);
-            } else {
-                // Tüm kelimeler tamamlandı
-                finishPractice();
-            }
-        }
-        
-        // İlerlemeyi güncelle (Mod 1)
-        function updateProgress() {
-            const progress = ((currentWordIndex + 1) / allWords.length) * 100;
-            progressFill.style.width = `${progress}%`;
-            progressText.textContent = `${currentWordIndex + 1}/${allWords.length}`;
-        }
-        
-        // Cevabı işle (Mod 1)
-        function handleAnswer(isCorrect) {
-            const currentWord = allWords[currentWordIndex];
-            
-            if (isCorrect) {
-                correctWords.push(currentWord);
-                // Hızlı geri bildirim
-                bigCorrectBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    bigCorrectBtn.style.transform = 'scale(1)';
-                }, 150);
-            } else {
-                incorrectWords.push(currentWord);
-                // Hızlı geri bildirim
-                bigIncorrectBtn.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    bigIncorrectBtn.style.transform = 'scale(1)';
-                }, 150);
-            }
-            
-            // Sonraki kelimeye geç
-            currentWordIndex++;
-            
-            // Kısa bekleme ve sonraki kelimeyi göster
-            setTimeout(() => {
-                showCurrentWord();
-            }, 200);
-        }
-        
-        // Uygulamayı durdur (Mod 1)
-        function pausePractice() {
-            if (allWords.length > 0 && (correctWords.length + incorrectWords.length < allWords.length)) {
-                if (confirm('Elemeyi durdurup sonuçları görmek istediğinize emin misiniz?')) {
-                    finishPractice();
-                }
-            } else {
-                finishPractice();
-            }
-        }
-        
-        // Uygulamayı bitir (Mod 1)
-        function finishPractice() {
-            // Eksik kelimeleri incorrectWords'e ekle (yarıda bırakıldıysa)
-            if (currentWordIndex < allWords.length) {
-                for (let i = currentWordIndex; i < allWords.length; i++) {
-                    if (!correctWords.includes(allWords[i]) && !incorrectWords.includes(allWords[i])) {
-                        incorrectWords.push(allWords[i]);
-                    }
-                }
-            }
-            
-            // Faz değiştir
-            switchPhase(2, 3);
-            
-            // Sonuçları göster
-            displayResults();
-        }
-        
-        // Sonuçları göster (Mod 1)
-        function displayResults() {
-            // Toplam kelime sayısı
-            const total = allWords.length;
-            totalWordsCount.textContent = total;
-            
-            // Doğru ve yanlış sayıları
-            const correct = correctWords.length;
-            const incorrect = incorrectWords.length;
-            
-            // Doğru oranı
-            const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
-            correctPercentage.textContent = `${percentage}%`;
-            correctPercentageBar.style.width = `${percentage}%`;
-            
-            // Doğru kelimeler
-            correctList.innerHTML = '';
-            correctWords.forEach(word => {
-                const li = document.createElement('li');
-                li.textContent = word;
-                correctList.appendChild(li);
-            });
-            correctCount.textContent = correct;
-            
-            // Yanlış kelimeler
-            incorrectList.innerHTML = '';
-            incorrectWords.forEach(word => {
-                const li = document.createElement('li');
-                li.textContent = word;
-                incorrectList.appendChild(li);
-            });
-            incorrectCount.textContent = incorrect;
-            
-            // Tebrik veya motivasyon mesajı
-            const existingMessage = phase3.querySelector('.result-message');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-            
-            let message = '';
-            if (incorrect === 0 && total > 0) {
-                message = '<i class="fas fa-trophy"></i> Mükemmel! Tüm kelimeleri biliyorsunuz!';
-            } else if (percentage >= 80) {
-                message = '<i class="fas fa-star"></i> Çok iyi! Harika bir sonuç!';
-            } else if (percentage >= 60) {
-                message = '<i class="fas fa-thumbs-up"></i> İyi gidiyorsunuz, biraz daha çalışın!';
-            } else {
-                message = '<i class="fas fa-redo"></i> Daha çok pratik yapmanız gerekiyor. Tekrar deneyin!';
-            }
-            
-            const messageElem = document.createElement('p');
-            messageElem.className = 'result-message';
-            messageElem.style.cssText = 'text-align:center; padding:15px; margin:20px auto; background:linear-gradient(135deg, #ff6b6b, #4ecdc4); color:white; border-radius:10px; max-width:400px; font-weight:bold;';
-            messageElem.innerHTML = message;
-            
-            const buttonsContainer = phase3.querySelector('.buttons');
-            phase3.insertBefore(messageElem, buttonsContainer);
-        }
-        
-        // Benzersiz kelime sonuçlarını göster (Mod 2)
-        function displayUniqueResults() {
-            // İstatistikleri güncelle
-            const original = allWords.length;
-            const unique = uniqueWords.length;
-            const duplicates = original - unique;
-            
-            originalCount.textContent = original;
-            uniqueCount.textContent = unique;
-            duplicateCount.textContent = duplicates;
-            uniqueWordsCount.textContent = unique;
-            
-            // Benzersiz kelimeleri listele
-            uniqueList.innerHTML = '';
-            uniqueWords.forEach(word => {
-                const li = document.createElement('li');
-                li.textContent = word;
-                uniqueList.appendChild(li);
-            });
-            
-            // Bilgi mesajı
-            const existingMessage = phase4.querySelector('.result-message');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-            
-            let message = '';
-            if (duplicates === 0) {
-                message = '<i class="fas fa-check-circle"></i> Listenizde hiç tekrar eden kelime yok!';
-            } else {
-                message = `<i class="fas fa-filter"></i> ${duplicates} adet tekrar eden kelime çıkarıldı.`;
-            }
-            
-            const messageElem = document.createElement('p');
-            messageElem.className = 'result-message';
-            messageElem.style.cssText = 'text-align:center; padding:15px; margin:20px auto; background:linear-gradient(135deg, #3498db, #2980b9); color:white; border-radius:10px; max-width:400px; font-weight:bold;';
-            messageElem.innerHTML = message;
-            
-            const buttonsContainer = phase4.querySelector('.buttons');
-            phase4.insertBefore(messageElem, buttonsContainer);
-        }
-        
-        // Uygulamayı yeniden başlat (Mod 1)
-        function restartPractice(onlyWrong = false) {
-            let wordsToPractice = [];
-            
-            if (onlyWrong && incorrectWords.length > 0) {
-                // Sadece yanlışları çalış
-                wordsToPractice = [...incorrectWords];
-            } else {
-                // Tüm kelimeleri çalış
-                wordsToPractice = [...originalWords];
-            }
-            
-            if (wordsToPractice.length === 0) {
-                alert('Çalışılacak kelime bulunamadı!');
-                return;
-            }
-            
-            // Kelimeleri karıştır
-            allWords = shuffleArray(wordsToPractice);
-            
-            // Sıfırla
-            currentWordIndex = 0;
-            correctWords = [];
-            incorrectWords = [];
-            
-            // Faz değiştir
-            switchPhase(3, 2);
-            
-            // İlk kelimeyi göster
-            showCurrentWord();
-        }
-        
-        // Yeni liste ile başla (Mod 1)
-        function newList() {
-            // Faz değiştir
-            switchPhase(3, 1);
-            
-            // Input'u temizle
-            wordInput.value = '';
-            wordInput.focus();
-        }
-        
-        // Yeni liste ile başla (Mod 2)
-        function newListForUnique() {
-            // Faz değiştir
-            switchPhase(4, 1);
-            
-            // Input'u temizle
-            wordInput.value = '';
-            wordInput.focus();
-        }
-        
-        // Tüm sonuçları indir (Mod 1)
-        function downloadAllResults() {
-            if (correctWords.length === 0 && incorrectWords.length === 0) {
-                alert('İndirilecek sonuç bulunamadı!');
-                return;
-            }
-            
-            // Tarih ve saat bilgisi
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
-            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
-            
-            // Metin içeriği oluştur
-            let content = `Tabu Kelime Eleme Sonuçları\n`;
-            content += `Tarih: ${dateStr} ${timeStr}\n`;
-            content += `Toplam Kelime: ${allWords.length}\n`;
-            content += `Bilinenler: ${correctWords.length}\n`;
-            content += `Tekrar Çalışılacaklar: ${incorrectWords.length}\n`;
-            content += `Başarı Oranı: ${Math.round((correctWords.length / allWords.length) * 100)}%\n\n`;
-            
-            content += `=== BİLİNEN KELİMELER ===\n`;
-            correctWords.forEach((word, index) => {
-                content += `${index + 1}. ${word}\n`;
-            });
-            
-            content += `\n=== TEKRAR ÇALIŞILACAK KELİMELER ===\n`;
-            incorrectWords.forEach((word, index) => {
-                content += `${index + 1}. ${word}\n`;
-            });
-            
-            // Dosya adı
-            const fileName = `tabu-sonuclari-${dateStr}-${timeStr}.txt`;
-            
-            // Dosyayı indir
-            downloadFile(content, fileName, 'text/plain');
-        }
-        
-        // Sadece tekrar çalışılacakları indir (Mod 1)
-        function downloadWrongResults() {
-            if (incorrectWords.length === 0) {
-                alert('Tekrar çalışılacak kelime bulunamadı!');
-                return;
-            }
-            
-            // Tarih ve saat bilgisi
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
-            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
-            
-            // Metin içeriği oluştur
-            let content = `Tabu Kelime Eleme - Tekrar Çalışılacaklar\n`;
-            content += `Tarih: ${dateStr} ${timeStr}\n`;
-            content += `Toplam: ${incorrectWords.length} kelime\n\n`;
-            
-            content += `=== TEKRAR ÇALIŞILACAK KELİMELER ===\n`;
-            incorrectWords.forEach((word, index) => {
-                content += `${index + 1}. ${word}\n`;
-            });
-            
-            // Dosya adı
-            const fileName = `tabu-tekrar-calisilacaklar-${dateStr}-${timeStr}.txt`;
-            
-            // Dosyayı indir
-            downloadFile(content, fileName, 'text/plain');
-        }
-        
-        // Benzersiz kelimeleri indir (Mod 2)
-        function downloadUniqueResults() {
-            if (uniqueWords.length === 0) {
-                alert('Benzersiz kelime bulunamadı!');
-                return;
-            }
-            
-            // Tarih ve saat bilgisi
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
-            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
-            
-            // Metin içeriği oluştur
-            let content = `Tabu Benzersiz Kelime Listesi\n`;
-            content += `Tarih: ${dateStr} ${timeStr}\n`;
-            content += `Orijinal Kelime Sayısı: ${allWords.length}\n`;
-            content += `Benzersiz Kelime Sayısı: ${uniqueWords.length}\n`;
-            content += `Çıkarılan Tekrar Sayısı: ${allWords.length - uniqueWords.length}\n\n`;
-            
-            content += `=== BENZERSİZ KELİMELER ===\n`;
-            uniqueWords.forEach((word, index) => {
-                content += `${index + 1}. ${word}\n`;
-            });
-            
-            // Dosya adı
-            const fileName = `tabu-benzersiz-kelimeler-${dateStr}-${timeStr}.txt`;
-            
-            // Dosyayı indir
-            downloadFile(content, fileName, 'text/plain');
-        }
-        
-        // Tekrar eden kelimeleri indir (Mod 2)
-        function downloadDuplicateResults() {
-            if (duplicateWords.length === 0) {
-                alert('Tekrar eden kelime bulunamadı!');
-                return;
-            }
-            
-            // Tarih ve saat bilgisi
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR').replace(/[/]/g, '-');
-            const timeStr = now.toLocaleTimeString('tr-TR').replace(/[:]/g, '.');
-            
-            // Metin içeriği oluştur
-            let content = `Tabu Tekrar Eden Kelimeler\n`;
-            content += `Tarih: ${dateStr} ${timeStr}\n`;
-            content += `Toplam Tekrar Eden Kelime: ${duplicateWords.length}\n\n`;
-            
-            content += `=== TEKRAR EDEN KELİMELER ===\n`;
-            duplicateWords.forEach((word, index) => {
-                content += `${index + 1}. ${word}\n`;
-            });
-            
-            // Dosya adı
-            const fileName = `tabu-tekrar-edenler-${dateStr}-${timeStr}.txt`;
-            
-            // Dosyayı indir
-            downloadFile(content, fileName, 'text/plain');
-        }
-        
-        // Dosya indirme fonksiyonu
-        function downloadFile(content, fileName, mimeType) {
-            // Blob oluştur
-            const blob = new Blob([content], { type: mimeType });
-            
-            // URL oluştur
-            const url = URL.createObjectURL(blob);
-            
-            // Link oluştur ve tıklama simüle et
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            
-            // Temizlik
-            setTimeout(() => {
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            // Kullanıcıya geri bildirim
-            showDownloadNotification();
-        }
-        
-        // İndirme bildirimi göster
-        function showDownloadNotification() {
-            // Mevcut bildirimi kaldır
-            const existingNotification = document.querySelector('.download-notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-            
-            // Yeni bildirim oluştur
-            const notification = document.createElement('div');
-            notification.className = 'download-notification';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(to right, #2ecc71, #27ae60);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 1000;
-                animation: slideIn 0.3s ease-out;
-                max-width: 300px;
-            `;
-            
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-check-circle" style="font-size: 1.2rem;"></i>
-                    <div>
-                        <strong>İndirme Başladı</strong>
-                        <div style="font-size: 0.9rem; margin-top: 5px;">Dosya cihazınıza indiriliyor...</div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // 3 saniye sonra bildirimi kaldır
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOut 0.3s ease-out';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            }, 3000);
-            
-            // Animasyon CSS'ini ekle
-            if (!document.querySelector('#downloadAnimations')) {
-                const style = document.createElement('style');
-                style.id = 'downloadAnimations';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    @keyframes slideOut {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        
-        // Klavye kısayolları
-        function handleKeyDown(e) {
-            // Sadece phase2'deyken klavye kısayolları çalışsın (Mod 1)
-            if (!phase2.classList.contains('active')) return;
-            
-            switch(e.key) {
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                case '1':
-                    handleAnswer(true);
-                    e.preventDefault();
-                    break;
-                    
-                case 'ArrowLeft':
-                case 'y':
-                case 'Y':
-                case '2':
-                    handleAnswer(false);
-                    e.preventDefault();
-                    break;
-                    
-                case ' ':
-                case 'Enter':
-                    pausePractice();
-                    e.preventDefault();
-                    break;
-                    
-                case 'Escape':
-                    if (confirm('Elemeyi durdurmak istiyor musunuz?')) {
-                        finishPractice();
-                    }
-                    e.preventDefault();
-                    break;
-            }
-        }
-        
-        // Dokunma olayları (swipe için)
-        function setupTouchEvents() {
-            let startX = 0;
-            let startY = 0;
-            
-            document.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            }, { passive: true });
-            
-            document.addEventListener('touchend', (e) => {
-                // Sadece phase2'deyken swipe çalışsın (Mod 1)
-                if (!phase2.classList.contains('active')) return;
-                
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                
-                const diffX = endX - startX;
-                const diffY = endY - startY;
-                
-                // Yatay kaydırma mı dikey kaydırma mı?
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Yatay kaydırma
-                    if (Math.abs(diffX) > 50) { // Minimum kaydırma mesafesi
-                        if (diffX > 0) {
-                            // Sağa kaydırma = Doğru
-                            handleAnswer(true);
-                        } else {
-                            // Sola kaydırma = Yanlış
-                            handleAnswer(false);
-                        }
-                    }
-                }
-            }, { passive: true });
-        }
-        
-        // Sayfa yüklendiğinde uygulamayı başlat
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+      }, { passive: true });
+    }
+
+    // ===========================
+    //  INIT
+    // ===========================
+    function initApp() {
+      continueBtn.addEventListener('click', continueToInput);
+
+      mode1Btn.addEventListener('click', () => selectMode(1));
+      mode2Btn.addEventListener('click', () => selectMode(2));
+
+      mode1Btn.addEventListener('keydown', (e) => { if (e.key === 'Enter') selectMode(1); });
+      mode2Btn.addEventListener('keydown', (e) => { if (e.key === 'Enter') selectMode(2); });
+
+      startBtn.addEventListener('click', startProcess);
+      exampleBtn.addEventListener('click', loadExampleWords);
+
+      backToModeBtn.addEventListener('click', backToModeSelect);
+      backToModeFromResultsBtn.addEventListener('click', backToModeSelect);
+      backToModeFromElemeBtn.addEventListener('click', backToModeSelect);
+
+      correctBtn.addEventListener('click', () => handleAnswer(true));
+      incorrectBtn.addEventListener('click', () => handleAnswer(false));
+      bigCorrectBtn.addEventListener('click', () => handleAnswer(true));
+      bigIncorrectBtn.addEventListener('click', () => handleAnswer(false));
+
+      pauseBtn.addEventListener('click', pausePractice);
+
+      restartBtn.addEventListener('click', () => restartPractice(false));
+      practiceWrongBtn.addEventListener('click', () => restartPractice(true));
+      newListBtn.addEventListener('click', newList);
+
+      // Copy
+      copyKnownCommaBtn.addEventListener('click', copyKnownComma);
+      copyWrongCommaBtn.addEventListener('click', copyWrongComma);
+      copyKnownNumberedBtn.addEventListener('click', copyKnownNumbered);
+      copyWrongNumberedBtn.addEventListener('click', copyWrongNumbered);
+
+      // Downloads
+      downloadAllBtn.addEventListener('click', downloadAllResults);
+      downloadWrongBtn.addEventListener('click', downloadWrongResults);
+      downloadUniqueBtn.addEventListener('click', downloadUniqueResults);
+      downloadDuplicatesBtn.addEventListener('click', downloadDuplicateResults);
+
+      restartUniqueBtn.addEventListener('click', newListForUnique);
+
+      document.addEventListener('keydown', handleKeyDown);
+      setupTouchEvents();
+
+      loadExampleWords();
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
 </body>
 </html>
